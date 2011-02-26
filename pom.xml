@@ -10,24 +10,39 @@
 
     <groupId>jenkins</groupId>
     <artifactId>repository</artifactId>
-    <description>Jenkins Maven Repository Plugin</description>
+    <name>Jenkins Maven Repository Server Plugin</name>
+    <description>This plug-in exposes project builds as a maven repository so the artifacts can be picked up by
+        downstream builds or other systems.
+    </description>
     <version>0.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
+
+    <url>http://wiki.jenkins-ci.org/display/JENKINS/Jenkins+Maven+Repository+Server</url>
+
+    <developers>
+        <developer>
+            <id>magnayn</id>
+            <name>Nigel Magnay</name>
+            <email>nigel.magnay@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+	    <connection>scm:git:git://github.com/magnayn/Jenkins-Repository.git</connection>
+	    <developerConnection>scm:git:git@github.com:magnayn/Jenkins-Repository.git</developerConnection>
+	</scm>
 
     <dependencies>
         <dependency>
             <groupId>org.jvnet.hudson.plugins</groupId>
-
             <artifactId>git</artifactId>
             <version>1.1.5</version>
-
         </dependency>
 
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <version>1.396</version>
             <artifactId>maven-plugin</artifactId>
-
         </dependency>
     </dependencies>
 
@@ -45,4 +60,12 @@
             <url>http://maven.glassfish.org/content/groups/public/</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <distributionManagement>
+        <repository>
+            <id>maven.jenkins-ci.org</id>
+            <url>http://maven.jenkins-ci.org:8081/content/repositories/releases/</url>
+        </repository>
+    </distributionManagement>
+
 </project>

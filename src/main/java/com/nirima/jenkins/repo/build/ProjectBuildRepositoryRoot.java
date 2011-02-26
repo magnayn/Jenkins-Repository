@@ -71,7 +71,12 @@ public class ProjectBuildRepositoryRoot extends AbstractRepositoryDirectory<Run>
                     MavenArtifactRecord artifacts = build.getAction(MavenArtifactRecord.class);
 
                     register(build, artifacts.pomArtifact);
-                    register(build, artifacts.mainArtifact);
+
+                    if( artifacts.mainArtifact != artifacts.pomArtifact )
+                    {
+                        // Sometimes the POM is the only thing being made..
+                        register(build, artifacts.mainArtifact);
+                    }
                     for(MavenArtifact art : artifacts.attachedArtifacts)
                     {
                         register(build, art);

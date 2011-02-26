@@ -23,20 +23,25 @@
  */
 package com.nirima.jenkins.repo.build;
 
-import com.nirima.jenkins.repo.AbstractRepositoryDirectory;
+import com.nirima.jenkins.RepositoryPlugin;
+import com.nirima.jenkins.repo.AbstractRepositoryElement;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Represent a directory
  */
-public class DirectoryRepositoryItem extends AbstractRepositoryDirectory<String> implements RepositoryDirectory {
+public class DirectoryRepositoryItem extends AbstractRepositoryElement<String> implements RepositoryDirectory {
 
-    ArrayList<RepositoryElement> items = new ArrayList<RepositoryElement>();
+    private static final Logger LOGGER = Logger.getLogger(RepositoryPlugin.class.getName());
+
+    Map<String, RepositoryElement> items = new HashMap<String, RepositoryElement>();
 
     protected DirectoryRepositoryItem(RepositoryElement parent, String item) {
         super(parent, item);
@@ -47,9 +52,8 @@ public class DirectoryRepositoryItem extends AbstractRepositoryDirectory<String>
         return item;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
     public Collection<? extends RepositoryElement> getChildren() {
-        return items;  //To change body of implemented methods use File | Settings | File Templates.
+        return items.values();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void insert(File f, String path)
@@ -60,18 +64,36 @@ public class DirectoryRepositoryItem extends AbstractRepositoryDirectory<String>
             String dir = path.substring(0, idx);
             String rest = path.substring(idx+1);
 
-            RepositoryElement dirElement = getChild(dir);
+            RepositoryElement dirElement = getChild(dir); // Get directory element
             if( dirElement == null )
             {
-                dirElement = new DirectoryRepositoryItem(this, dir);
-                items.add(dirElement);
+                // It doesn't already exist so create it:
+                dirElement = add(new DirectoryRepositoryItem(this, dir));
             }
 
+            // Insert into that directory.
             ((DirectoryRepositoryItem)dirElement).insert(f, rest);
         }
         else
         {
-            items.add(new FileRepositoryItem(this,f,path) );
+            // Not a path but a file for this location
+            add(new FileRepositoryItem(this,f,path));
         }
+    }
+
+    protected RepositoryElement add(RepositoryElement dirElement)
+    {
+        if ( items.containsKey(dirElement.getName()) )
+        {
+            LOGGER.warning("Already have element named " + dirElement.getName() + " for path " + getPath());
+        }
+        items.put(dirElement.getName(), dirElement);
+
+        return dirElement;
+    }
+
+    public RepositoryElement getChild(String element)
+    {
+       return items.get(element);
     }
 }

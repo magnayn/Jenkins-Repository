@@ -103,10 +103,6 @@ public class RepositoryPlugin extends Plugin {
             // try static content
             super.doDynamic(req, rsp);
         }
-
-
-        //
-
     }
 
     private void displayElement(StaplerRequest req, StaplerResponse rsp, RepositoryElement currentItem) throws Exception {
