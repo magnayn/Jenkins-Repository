@@ -21,51 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.nirima.jenkins.repo.project;
+package com.nirima.jenkins.repo.fs;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-import com.nirima.jenkins.repo.AbstractRepositoryDirectory;
-import hudson.model.BuildableItemWithBuildWrappers;
-import hudson.model.Hudson;
+import com.nirima.jenkins.repo.AbstractRepositoryElement;
+import com.nirima.jenkins.repo.RepositoryContent;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
 
-import java.util.Collection;
-import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
-public class ProjectsElement extends AbstractRepositoryDirectory implements RepositoryDirectory {
-    public ProjectsElement(RepositoryDirectory parent) {
+public class FileRepositoryItem extends AbstractRepositoryElement implements RepositoryContent {
+    protected String name;
+    protected File item;
+
+    protected FileRepositoryItem(RepositoryDirectory parent, File item, String name) {
         super(parent);
+        this.name = name;
+        this.item = item;
     }
 
     @Override
     public String getName() {
-        return "project";
+        return name;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Collection<ProjectElement> getChildren() {
-
-        List<ProjectElement> elements = Lists.newArrayList(Iterators.transform(Hudson.getInstance().getAllItems(BuildableItemWithBuildWrappers.class).iterator(),
-                new Function<BuildableItemWithBuildWrappers,ProjectElement>()
-                {
-                    public ProjectElement apply(BuildableItemWithBuildWrappers from) {
-                        return new ProjectElement(ProjectsElement.this, from);
-                    }
-                }));
-
-       return elements;
+    public InputStream getContent() throws FileNotFoundException {
+        return new FileInputStream(item);
     }
 
-    public RepositoryElement getChild(String element) {
-         for( RepositoryElement e : getChildren())
-        {
-            if( e.getName().equals(element) )
-                return e;
-        }
-        throw new IllegalArgumentException();
+    public String getLastModified() {
+        return "" + item.lastModified();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public Long getSize() {
+        return item.length();  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
+    public String getDescription() {
+        return "";  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

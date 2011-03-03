@@ -21,31 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.nirima.jenkins.repo.build;
+package com.nirima.jenkins.repo.util;
 
-import com.nirima.jenkins.repo.AbstractRepositoryElement;
-import com.nirima.jenkins.repo.RepositoryContent;
-import com.nirima.jenkins.repo.RepositoryElement;
+import com.nirima.jenkins.repo.build.DirectoryRepositoryItem;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
-public class FileRepositoryItem extends AbstractRepositoryElement<File> implements RepositoryContent {
-    protected String name;
-
-    protected FileRepositoryItem(RepositoryElement parent, File item, String name) {
-        super(parent, item);
-        this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return name;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public InputStream getContent() throws FileNotFoundException {
-        return new FileInputStream(item);
-    }
+/**
+ * Created by IntelliJ IDEA.
+ * User: magnayn
+ * Date: 02/03/2011
+ * Time: 16:35
+ * To change this template use File | Settings | File Templates.
+ */
+public interface IDirectoryPopulator {
+    void populate(DirectoryRepositoryItem directory);
 }

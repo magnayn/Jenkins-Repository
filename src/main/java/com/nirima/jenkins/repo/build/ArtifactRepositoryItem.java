@@ -23,37 +23,78 @@
  */
 package com.nirima.jenkins.repo.build;
 
+import com.nirima.jenkins.repo.RepositoryContent;
+import hudson.maven.MavenBuild;
+import hudson.maven.reporters.MavenArtifact;
 import hudson.model.Run;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Date;
+
 /**
- * Created by IntelliJ IDEA.
- * User: magnayn
- * Date: 25/02/2011
- * Time: 19:00
- * To change this template use File | Settings | File Templates.
+ * Represent a maven repository item.
  */
-public class ArtifactRepositoryItem implements RepositoryElement {
+public class ArtifactRepositoryItem implements RepositoryContent {
 
-    private Run.Artifact artifact;
+    private MavenArtifact artifact;
     private RepositoryDirectory directory;
+    private MavenBuild build;
 
-    public ArtifactRepositoryItem(RepositoryDirectory directory, Run.Artifact artifact)
+    public ArtifactRepositoryItem(MavenBuild build, MavenArtifact mavenArtifact)
     {
-        this.artifact = artifact;
-        this.directory = directory;
+        this.artifact = mavenArtifact;
+        this.build    = build;
     }
 
     public String getName() {
-        return artifact.getFileName();
+        return artifact.fileName;
     }
 
     public RepositoryDirectory getParent() {
         return directory;
     }
 
+    public void setParent(RepositoryDirectory parent)
+    {
+        this.directory = parent;
+    }
+
     public String getPath() {
         return directory.getPath() + "/" + getName();
+    }
+
+    public InputStream getContent() throws Exception {
+        return new FileInputStream(getFile());
+    }
+
+    public String getLastModified() {
+        return "" + new Date( getFile().lastModified() ).toLocaleString();  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Long getSize() {
+        return getFile().length();
+    }
+
+    public String getDescription() {
+        return "From Build #" + build.getNumber() + " of " + build.getParentBuild().getParent().getName();
+    }
+
+    public File getFile()
+    {
+        File f = new File(new File(new File(new File(build.getArtifactsDir(), artifact.groupId), artifact.artifactId), artifact.version), artifact.fileName);
+        return f;
+    }
+
+    /**
+     * The path that the artifact believes it belongs to.
+     * @return
+     */
+    public String getArtifactPath()
+    {
+        return artifact.groupId.replace('.','/') + "/" + artifact.artifactId + '/' + artifact.version + "/" + artifact.canonicalName;
     }
 }

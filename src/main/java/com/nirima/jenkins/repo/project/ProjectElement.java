@@ -24,23 +24,31 @@
 package com.nirima.jenkins.repo.project;
 
 import com.google.common.collect.Lists;
+import com.nirima.jenkins.repo.RepositoryElement;
+import com.nirima.jenkins.repo.build.ProjectBuildRepositoryRoot;
 import hudson.model.BuildableItemWithBuildWrappers;
 import com.nirima.jenkins.repo.AbstractRepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 
 import java.util.Collection;
+import java.util.List;
 
-public class ProjectElement extends AbstractRepositoryDirectory<BuildableItemWithBuildWrappers> implements RepositoryDirectory {
+public class ProjectElement extends AbstractRepositoryDirectory implements RepositoryDirectory {
+
+     BuildableItemWithBuildWrappers item;
 
     public ProjectElement(RepositoryDirectory parent, BuildableItemWithBuildWrappers project)
     {
-        super(parent, project);
+        super(parent);
+        this.item = project;
     }
 
-    public Collection<ProjectBuildList> getChildren() {
+    public @Override Collection<? extends RepositoryElement> getChildren() {
 
-        Collection<ProjectBuildList> ar =  Lists.newArrayList(new ProjectBuildList(this, item, ProjectBuildList.Type.SHA1),
-                new ProjectBuildList(this, item, ProjectBuildList.Type.Build)
+        List<? extends RepositoryElement> ar =  Lists.newArrayList(
+                new ProjectBuildList(this, item, ProjectBuildList.Type.SHA1),
+                new ProjectBuildList(this, item, ProjectBuildList.Type.Build),
+                new ProjectBuildRepositoryRoot(this, item.asProject().getLastSuccessfulBuild(), "LastSuccessful")
         );
 
         return ar;

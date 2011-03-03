@@ -21,20 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.nirima.jenkins.repo.virtual;
 
-package com.nirima.jenkins.repo;
+import com.nirima.jenkins.repo.RepositoryDirectory;
+import com.nirima.jenkins.repo.build.DirectoryRepositoryItem;
+import com.nirima.jenkins.repo.build.PopulateOnDemandDirectoryRepositoryItem;
+import com.nirima.jenkins.repo.util.DirectoryPopulatorVisitor;
+import com.nirima.jenkins.repo.util.HudsonWalker;
+import com.nirima.jenkins.repo.util.IDirectoryPopulator;
 
-import java.io.InputStream;
+/**
+ * Created by IntelliJ IDEA.
+ * User: magnayn
+ * Date: 02/03/2011
+ * Time: 15:15
+ * To change this template use File | Settings | File Templates.
+ */
+public class VirtualRepositoryRoot extends PopulateOnDemandDirectoryRepositoryItem {
 
-
-public interface RepositoryContent extends RepositoryElement {
-
-    public InputStream getContent() throws Exception;
-
-    public String getLastModified();
-
-    public Long getSize();
-
-    public String getDescription();
-
+    public VirtualRepositoryRoot(RepositoryDirectory parent) {
+        super(parent, "everything", new IDirectoryPopulator() {
+            public void populate(DirectoryRepositoryItem directory) {
+                HudsonWalker.traverse(new DirectoryPopulatorVisitor(directory,false));
+            }
+        });
+    }
 }

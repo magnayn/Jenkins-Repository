@@ -21,20 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.nirima.jenkins.repo.util;
 
-package com.nirima.jenkins.repo;
+import com.google.common.collect.Lists;
+import com.nirima.jenkins.repo.RepositoryElement;
+import com.nirima.jenkins.repo.build.ArtifactRepositoryItem;
+import hudson.maven.MavenBuild;
+import hudson.maven.MavenModule;
+import hudson.maven.MavenModuleSetBuild;
+import hudson.maven.reporters.MavenArtifact;
+import hudson.maven.reporters.MavenArtifactRecord;
+import hudson.model.BuildableItemWithBuildWrappers;
 
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
+/**
+ * Created by IntelliJ IDEA.
+ * User: magnayn
+ * Date: 02/03/2011
+ * Time: 16:15
+ * To change this template use File | Settings | File Templates.
+ */
+public abstract class HudsonVisitor {
 
-public interface RepositoryContent extends RepositoryElement {
+    public void visitModuleSet(MavenModuleSetBuild build)
+    {}
 
-    public InputStream getContent() throws Exception;
+    public void visitBuild(MavenBuild build)
+    {}
 
-    public String getLastModified();
+    public void visitArtifact(MavenBuild build, MavenArtifact artifact)
+    {}
 
-    public Long getSize();
-
-    public String getDescription();
-
+    public void visitProject(BuildableItemWithBuildWrappers item)
+    {}
 }

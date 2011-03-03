@@ -21,20 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package com.nirima.jenkins.repo;
 
-import java.io.InputStream;
+import com.google.common.collect.Lists;
+import com.nirima.jenkins.repo.project.ProjectBuildList;
+import com.nirima.jenkins.repo.project.ProjectsElement;
+import com.nirima.jenkins.repo.virtual.VirtualRepositoryRoot;
+import hudson.model.BuildableItemWithBuildWrappers;
+
+import java.util.Collection;
 
 
-public interface RepositoryContent extends RepositoryElement {
+public class RootElement extends AbstractRepositoryDirectory implements RepositoryDirectory {
 
-    public InputStream getContent() throws Exception;
+    public RootElement() {
+        super(null);
+    }
 
-    public String getLastModified();
+    public Collection<? extends RepositoryElement> getChildren() {
+        return Lists.newArrayList(
+                new ProjectsElement(this),
+                new VirtualRepositoryRoot(this)
+        );
+    }
 
-    public Long getSize();
+    public String getName() {
+        return "root";
+    }
 
-    public String getDescription();
 
 }

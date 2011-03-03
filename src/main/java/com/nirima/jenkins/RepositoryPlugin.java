@@ -23,6 +23,7 @@
  */
 package com.nirima.jenkins;
 
+import com.nirima.jenkins.repo.RootElement;
 import hudson.Extension;
 import hudson.Plugin;
 import hudson.model.*;
@@ -74,7 +75,7 @@ public class RepositoryPlugin extends Plugin {
             return;
         }
 
-        RepositoryElement currentItem = new ProjectsElement();
+        RepositoryElement currentItem = new RootElement();
 
         // Split into sections
         String[] pathElements = path.substring(1).split("/");
@@ -198,22 +199,31 @@ public class RepositoryPlugin extends Plugin {
     private void printDirEntry(OutputStream os, RepositoryElement item) throws IOException {
 
         String name = item.getName();
+        String lastModified = "";
+        String size = "";
+        String description = "";
 
         if (item instanceof RepositoryDirectory)
             name += "/";
+        if ( item instanceof RepositoryContent)
+        {
+            lastModified = ((RepositoryContent)item).getLastModified();
+            size =  "" + ((RepositoryContent)item).getSize();
+            description =   ((RepositoryContent)item).getDescription();
+        }
 
-        String entry = "      <tr>\n" +
+         String entry = "      <tr>\n" +
                 "            <td>\n" +
                 "                              <a href=\"" + name + "\">" + name + "</a>\n" +
                 "                          </td>\n" +
                 "            <td>\n" +
-                "              &nbsp;\n" +
+                "              " + lastModified + "\n" +
                 "            </td>\n" +
                 "            <td align=\"right\">\n" +
-                "                              &nbsp;\n" +
+                "                   " + size + "\n" +
                 "                          </td>\n" +
                 "            <td>\n" +
-                "              &nbsp;\n" +
+                "              " + description + "\n" +
                 "            </td>\n" +
                 "          </tr>";
 

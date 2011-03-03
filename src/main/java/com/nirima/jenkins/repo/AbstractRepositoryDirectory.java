@@ -25,13 +25,14 @@ package com.nirima.jenkins.repo;
 
 import java.util.Collection;
 
-public abstract class AbstractRepositoryDirectory<T> extends AbstractRepositoryElement<T> {
-    protected AbstractRepositoryDirectory(RepositoryElement parent, T item) {
-        super(parent, item);
+public abstract class AbstractRepositoryDirectory extends AbstractRepositoryElement {
+    protected AbstractRepositoryDirectory(RepositoryDirectory parent) {
+        super(parent);
     }
 
     public RepositoryElement getChild(String element)
     {
+        // Lowest common denominator implementation..
         for( RepositoryElement e : getChildren())
         {
             if( e.getName().equals(element) )

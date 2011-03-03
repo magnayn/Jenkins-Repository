@@ -21,45 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.nirima.jenkins.repo.build;
+package com.nirima.jenkins.repo.util;
 
 import com.nirima.jenkins.repo.RepositoryDirectory;
-import com.nirima.jenkins.repo.RepositoryElement;
+import com.nirima.jenkins.repo.build.ArtifactRepositoryItem;
+import com.nirima.jenkins.repo.build.DirectoryRepositoryItem;
+import hudson.maven.MavenBuild;
+import hudson.maven.MavenModule;
+import hudson.maven.MavenModuleSetBuild;
+import hudson.maven.reporters.MavenArtifact;
+import hudson.maven.reporters.MavenArtifactRecord;
+import hudson.model.Run;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class PathRepositoryItem  implements RepositoryDirectory
-{
-    protected String name;
-    Map<String, RepositoryElement> children = new HashMap<String, RepositoryElement>();
+/**
+ *  When called back, insert found artifacts into a directory.
+ */
+public class DirectoryPopulatorVisitor extends HudsonVisitor {
 
-    RepositoryElement parent;
+    DirectoryRepositoryItem root;
+    public boolean allowOverwrite;
 
-    public PathRepositoryItem(String name, RepositoryElement parent)
+    public DirectoryPopulatorVisitor(DirectoryRepositoryItem root, boolean allowOverwrite)
     {
-        this.name = name;
-        this.parent = parent;
+        this.root = root;
+        this.allowOverwrite = allowOverwrite;
     }
 
-    public Collection<RepositoryElement> getChildren() {
-        return children.values();
-    }
-
-    public RepositoryElement getChild(String element) {
-        return children.get(element);  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public String getName() {
-        return name;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public RepositoryElement getParent() {
-        return parent;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public String getPath() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public @Override void visitArtifact(MavenBuild build, MavenArtifact mavenArtifact)
+    {
+        ArtifactRepositoryItem repositoryItem = new ArtifactRepositoryItem(build, mavenArtifact);
+        root.insert(repositoryItem, repositoryItem.getArtifactPath(), allowOverwrite);
     }
 }

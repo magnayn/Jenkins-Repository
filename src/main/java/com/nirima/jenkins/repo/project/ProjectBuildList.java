@@ -38,7 +38,7 @@ import com.nirima.jenkins.repo.build.ProjectBuildRepositoryRoot;
 
 import java.util.*;
 
-public class ProjectBuildList extends AbstractRepositoryDirectory<BuildableItemWithBuildWrappers> implements RepositoryDirectory {
+public class ProjectBuildList extends AbstractRepositoryDirectory implements RepositoryDirectory {
 
     public enum Type {
         SHA1,
@@ -46,10 +46,12 @@ public class ProjectBuildList extends AbstractRepositoryDirectory<BuildableItemW
     }
 
     Type type;
+     BuildableItemWithBuildWrappers item;
 
-    protected ProjectBuildList(RepositoryElement parent, BuildableItemWithBuildWrappers item, Type type) {
-        super(parent, item);
+    protected ProjectBuildList(RepositoryDirectory parent, BuildableItemWithBuildWrappers item, Type type) {
+        super(parent);
         this.type = type;
+        this.item = item;
     }
 
     @Override

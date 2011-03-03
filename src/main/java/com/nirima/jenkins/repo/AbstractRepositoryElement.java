@@ -23,19 +23,22 @@
  */
 package com.nirima.jenkins.repo;
 
-public abstract class AbstractRepositoryElement<T> {
-    public T item;
-    protected RepositoryElement parent;
+public abstract class AbstractRepositoryElement {
 
-    protected AbstractRepositoryElement(RepositoryElement parent, T item)
+    protected RepositoryDirectory parent;
+
+    protected AbstractRepositoryElement(RepositoryDirectory parent)
     {
-        this.item = item;
         this.parent = parent;
     }
 
-    public RepositoryElement getParent()
+    public RepositoryDirectory getParent()
     {
         return parent;
+    }
+
+    public void setParent(RepositoryDirectory parent) {
+        this.parent = parent;
     }
 
     public String getPath()

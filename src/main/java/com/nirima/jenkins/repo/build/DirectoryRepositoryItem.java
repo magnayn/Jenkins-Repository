@@ -25,6 +25,7 @@ package com.nirima.jenkins.repo.build;
 
 import com.nirima.jenkins.RepositoryPlugin;
 import com.nirima.jenkins.repo.AbstractRepositoryElement;
+import com.nirima.jenkins.repo.RepositoryContent;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
 
@@ -37,26 +38,39 @@ import java.util.logging.Logger;
 /**
  * Represent a directory
  */
-public class DirectoryRepositoryItem extends AbstractRepositoryElement<String> implements RepositoryDirectory {
+public class DirectoryRepositoryItem extends AbstractRepositoryElement implements RepositoryDirectory {
 
     private static final Logger LOGGER = Logger.getLogger(RepositoryPlugin.class.getName());
 
-    Map<String, RepositoryElement> items = new HashMap<String, RepositoryElement>();
+    protected Map<String, RepositoryElement> items;
 
-    protected DirectoryRepositoryItem(RepositoryElement parent, String item) {
-        super(parent, item);
+    protected String name;
+
+    public DirectoryRepositoryItem(RepositoryDirectory parent, String name) {
+        super(parent);
+        this.name = name;
     }
 
     @Override
     public String getName() {
-        return item;  //To change body of implemented methods use File | Settings | File Templates.
+        return name;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    protected Map<String, RepositoryElement> getItems()
+    {
+        if( items == null )
+        {
+            items = new HashMap<String, RepositoryElement>();
+        }
+
+        return items;
     }
 
     public Collection<? extends RepositoryElement> getChildren() {
-        return items.values();  //To change body of implemented methods use File | Settings | File Templates.
+        return getItems().values();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void insert(File f, String path)
+    public void insert(RepositoryContent content, String path, boolean allowOverwrite)
     {
         if( path.contains("/") )
         {
@@ -68,32 +82,34 @@ public class DirectoryRepositoryItem extends AbstractRepositoryElement<String> i
             if( dirElement == null )
             {
                 // It doesn't already exist so create it:
-                dirElement = add(new DirectoryRepositoryItem(this, dir));
+                dirElement = add(new DirectoryRepositoryItem(this, dir), allowOverwrite);
             }
 
             // Insert into that directory.
-            ((DirectoryRepositoryItem)dirElement).insert(f, rest);
+            ((DirectoryRepositoryItem)dirElement).insert(content, rest, allowOverwrite);
         }
         else
         {
             // Not a path but a file for this location
-            add(new FileRepositoryItem(this,f,path));
+            add(content, allowOverwrite);
         }
     }
 
-    protected RepositoryElement add(RepositoryElement dirElement)
+    protected RepositoryElement add(RepositoryElement dirElement, boolean allowOverwrite)
     {
-        if ( items.containsKey(dirElement.getName()) )
+        if ( getItems().containsKey(dirElement.getName()) )
         {
-            LOGGER.warning("Already have element named " + dirElement.getName() + " for path " + getPath());
+            //LOGGER.warning("Already have element named " + dirElement.getName() + " for path " + getPath());
+            if( !allowOverwrite )
+                return items.get(dirElement.getName());
         }
-        items.put(dirElement.getName(), dirElement);
-
+        getItems().put(dirElement.getName(), dirElement);
+        dirElement.setParent(this);
         return dirElement;
     }
 
     public RepositoryElement getChild(String element)
     {
-       return items.get(element);
+       return getItems().get(element);
     }
 }

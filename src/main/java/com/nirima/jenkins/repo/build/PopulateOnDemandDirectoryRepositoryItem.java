@@ -21,20 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package com.nirima.jenkins.repo.build;
 
-package com.nirima.jenkins.repo;
+import com.nirima.jenkins.repo.RepositoryDirectory;
+import com.nirima.jenkins.repo.RepositoryElement;
+import com.nirima.jenkins.repo.util.IDirectoryPopulator;
 
-import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 
-public interface RepositoryContent extends RepositoryElement {
+public class PopulateOnDemandDirectoryRepositoryItem extends DirectoryRepositoryItem {
 
-    public InputStream getContent() throws Exception;
+    IDirectoryPopulator populator;
 
-    public String getLastModified();
+    public PopulateOnDemandDirectoryRepositoryItem(RepositoryDirectory parent, String item, IDirectoryPopulator populator) {
+        super(parent, item);
+        this.populator = populator;
+    }
 
-    public Long getSize();
-
-    public String getDescription();
-
+    protected
+    @Override
+    Map<String, RepositoryElement> getItems() {
+        if (items == null) {
+            items = new HashMap<String, RepositoryElement>();
+            populator.populate(this);
+        }
+        return items;
+    }
 }

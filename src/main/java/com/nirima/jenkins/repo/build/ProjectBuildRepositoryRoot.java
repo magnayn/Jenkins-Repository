@@ -24,6 +24,9 @@
 package com.nirima.jenkins.repo.build;
 
 import com.google.common.collect.Lists;
+import com.nirima.jenkins.repo.util.DirectoryPopulatorVisitor;
+import com.nirima.jenkins.repo.util.HudsonWalker;
+import com.nirima.jenkins.repo.util.IDirectoryPopulator;
 import hudson.maven.MavenBuild;
 import hudson.maven.MavenModule;
 import hudson.maven.reporters.MavenArtifact;
@@ -42,15 +45,15 @@ import java.util.Map;
 import hudson.maven.MavenModuleSetBuild;
 
 
-public class ProjectBuildRepositoryRoot extends AbstractRepositoryDirectory<Run> implements RepositoryDirectory {
+public class ProjectBuildRepositoryRoot extends AbstractRepositoryDirectory implements RepositoryDirectory {
     private String name;
 
-    protected DirectoryRepositoryItem root;
+    protected Run item;
 
-    public ProjectBuildRepositoryRoot(RepositoryElement parent, Run item, String name) {
-        super(parent, item);
+    public ProjectBuildRepositoryRoot(RepositoryDirectory parent, final Run item, String name) {
+        super(parent);
         this.name = name;
-        root = new DirectoryRepositoryItem(this,"repository");
+        this.item = item;
     }
 
     @Override
@@ -59,52 +62,21 @@ public class ProjectBuildRepositoryRoot extends AbstractRepositoryDirectory<Run>
     }
 
     public Collection<? extends RepositoryElement> getChildren() {
-
-        if( item instanceof MavenModuleSetBuild )
-        {
-            Map<MavenModule,List<MavenBuild>> modulesMap = ((MavenModuleSetBuild) item).getModuleBuilds();
-
-            for(List<MavenBuild> builds : modulesMap.values())
-            {
-                for( MavenBuild build : builds)
-                {
-                    MavenArtifactRecord artifacts = build.getAction(MavenArtifactRecord.class);
-
-                    register(build, artifacts.pomArtifact);
-
-                    if( artifacts.mainArtifact != artifacts.pomArtifact )
-                    {
-                        // Sometimes the POM is the only thing being made..
-                        register(build, artifacts.mainArtifact);
-                    }
-                    for(MavenArtifact art : artifacts.attachedArtifacts)
-                    {
-                        register(build, art);
-                    }
+       return Lists.newArrayList(
+            new PopulateOnDemandDirectoryRepositoryItem(this,"repository", new IDirectoryPopulator() {
+                public void populate(DirectoryRepositoryItem directory) {
+                    HudsonWalker.traverse(new DirectoryPopulatorVisitor(directory,false) ,item);
                 }
-
-            }
-
-            return Lists.newArrayList(root);
-        }
-
-        // TODO: Don't know if Ant/freestyle builds could be examined for artifacts?
-
-        return new ArrayList();
+            }),
+            new PopulateOnDemandDirectoryRepositoryItem(this,"repositoryChain", new IDirectoryPopulator() {
+                public void populate(DirectoryRepositoryItem directory) {
+                    HudsonWalker.traverseChain(new DirectoryPopulatorVisitor(directory,false) ,item);
+                }
+            })
+       );
     }
 
-    private void register(MavenBuild build, MavenArtifact mavenArtifact) {
-        String path = mavenArtifact.groupId.replace('.','/') + "/" + mavenArtifact.artifactId + '/' + mavenArtifact.version + "/" + mavenArtifact.canonicalName;
-        File f = new File(new File(new File(new File(build.getArtifactsDir(), mavenArtifact.groupId), mavenArtifact.artifactId), mavenArtifact.version), mavenArtifact.fileName);
-        if( f.exists() )
-        {
-           insertFile(f, path);
-        }
 
-    }
 
-    private void insertFile(File f, String path) {
-        System.out.println("" + path + " = " + f.getAbsolutePath());
-        root.insert(f, path);
-    }
+
 }
