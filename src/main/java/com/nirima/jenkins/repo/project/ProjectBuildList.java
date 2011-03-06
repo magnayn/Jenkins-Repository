@@ -70,7 +70,8 @@ public class ProjectBuildList extends AbstractRepositoryDirectory implements Rep
             fn = new Function<Run, ProjectBuildRepositoryRoot>() {
 
                 public ProjectBuildRepositoryRoot apply(Run r) {
-                    // Run r = (Run)from;
+                    if( r.getResult() != Result.SUCCESS )
+                        return null;
                     return new ProjectBuildRepositoryRoot(ProjectBuildList.this, r, "" + r.getNumber());
                 }
             };
@@ -89,7 +90,7 @@ public class ProjectBuildList extends AbstractRepositoryDirectory implements Rep
 
             for (Run run : item.asProject().getBuilds()) {
                 BuildData bd = run.getAction(BuildData.class);
-                if (bd != null) {
+                if (bd != null && run.getResult() == Result.SUCCESS) {
                     String sha1 = bd.getLastBuiltRevision().getSha1String();
 
                     // Most recent, only if successful
