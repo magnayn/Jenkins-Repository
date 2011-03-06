@@ -32,21 +32,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class PopulateOnDemandDirectoryRepositoryItem extends DirectoryRepositoryItem {
+public abstract class PopulateOnDemandDirectoryRepositoryItem extends DirectoryRepositoryItem {
 
-    IDirectoryPopulator populator;
-
-    public PopulateOnDemandDirectoryRepositoryItem(RepositoryDirectory parent, String item, IDirectoryPopulator populator) {
+    public PopulateOnDemandDirectoryRepositoryItem(RepositoryDirectory parent, String item) {
         super(parent, item);
-        this.populator = populator;
     }
+
+    protected abstract IDirectoryPopulator getPopulator();
 
     protected
     @Override
     Map<String, RepositoryElement> getItems() {
         if (items == null) {
             items = new HashMap<String, RepositoryElement>();
-            populator.populate(this);
+            getPopulator().populate(this);
         }
         return items;
     }

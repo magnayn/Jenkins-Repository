@@ -63,12 +63,12 @@ public class ProjectBuildRepositoryRoot extends AbstractRepositoryDirectory impl
 
     public Collection<? extends RepositoryElement> getChildren() {
        return Lists.newArrayList(
-            new PopulateOnDemandDirectoryRepositoryItem(this,"repository", new IDirectoryPopulator() {
+            new SimpleOnDemandItem(this,"repository", new IDirectoryPopulator() {
                 public void populate(DirectoryRepositoryItem directory) {
                     HudsonWalker.traverse(new DirectoryPopulatorVisitor(directory,false) ,item);
                 }
             }),
-            new PopulateOnDemandDirectoryRepositoryItem(this,"repositoryChain", new IDirectoryPopulator() {
+            new SimpleOnDemandItem(this,"repositoryChain", new IDirectoryPopulator() {
                 public void populate(DirectoryRepositoryItem directory) {
                     HudsonWalker.traverseChain(new DirectoryPopulatorVisitor(directory,false) ,item);
                 }

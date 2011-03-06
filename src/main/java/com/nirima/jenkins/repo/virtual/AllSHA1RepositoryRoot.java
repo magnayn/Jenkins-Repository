@@ -24,30 +24,44 @@
 package com.nirima.jenkins.repo.virtual;
 
 import com.nirima.jenkins.repo.RepositoryDirectory;
+import com.nirima.jenkins.repo.RepositoryElement;
 import com.nirima.jenkins.repo.build.DirectoryRepositoryItem;
 import com.nirima.jenkins.repo.build.PopulateOnDemandDirectoryRepositoryItem;
+import com.nirima.jenkins.repo.build.ProjectBuildRepositoryRoot;
 import com.nirima.jenkins.repo.util.DirectoryPopulatorVisitor;
+import com.nirima.jenkins.repo.util.HudsonVisitor;
 import com.nirima.jenkins.repo.util.HudsonWalker;
 import com.nirima.jenkins.repo.util.IDirectoryPopulator;
+import hudson.maven.MavenBuild;
+import hudson.maven.MavenModuleSetBuild;
+import hudson.model.Result;
+import hudson.plugins.git.util.BuildData;
 
 /**
- * Created by IntelliJ IDEA.
- * User: magnayn
- * Date: 02/03/2011
- * Time: 15:15
- * To change this template use File | Settings | File Templates.
+ * Represent all projects by SHA1.
  */
-public class VirtualRepositoryRoot extends PopulateOnDemandDirectoryRepositoryItem {
+public class AllSHA1RepositoryRoot extends PopulateOnDemandDirectoryRepositoryItem {
 
-    public VirtualRepositoryRoot(RepositoryDirectory parent) {
-        super(parent, "everything");
+    public AllSHA1RepositoryRoot(RepositoryDirectory parent) {
+        super(parent, "SHA1");
     }
 
-    protected IDirectoryPopulator getPopulator()
-    {
-        return new IDirectoryPopulator() {
-            public void populate(DirectoryRepositoryItem directory) {
-                HudsonWalker.traverse(new DirectoryPopulatorVisitor(directory,false));
+     protected IDirectoryPopulator getPopulator() {
+       return new IDirectoryPopulator() {
+            public void populate(final DirectoryRepositoryItem directory) {
+                HudsonWalker.traverseProjectsAndBuilds(new HudsonVisitor()
+                {
+                    public void visitModuleSet(MavenModuleSetBuild run)
+                    {
+                        BuildData bd = run.getAction(BuildData.class);
+                        if (bd != null && run.getResult() == Result.SUCCESS) {
+                            String sha1 = bd.getLastBuiltRevision().getSha1String();
+                            RepositoryElement content = new ProjectBuildRepositoryRoot(AllSHA1RepositoryRoot.this,run,sha1);
+                            add(content, false);
+
+                        }
+                    }
+                });
             }
         };
     }

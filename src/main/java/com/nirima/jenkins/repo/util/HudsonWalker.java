@@ -66,6 +66,26 @@ public class HudsonWalker {
     }
 
     /**
+     * Visit projects and builds
+     */
+    public static void traverseProjectsAndBuilds(HudsonVisitor visitor ) {
+        for (BuildableItemWithBuildWrappers item : Hudson.getInstance().getAllItems(BuildableItemWithBuildWrappers.class)) {
+
+            visitor.visitProject(item);
+
+            List<? extends Run> runs = item.asProject().getBuilds();
+            for (Run run : runs) {
+                 if (run instanceof MavenModuleSetBuild) {
+                    MavenModuleSetBuild mmsb = (MavenModuleSetBuild) run;
+
+                    visitor.visitModuleSet(mmsb);
+                 }
+            }
+        }
+    }
+
+
+    /**
      * visit project chain, from current through parents.
      * @param visitor
      * @param run

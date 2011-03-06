@@ -21,35 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.nirima.jenkins.repo;
+package com.nirima.jenkins.repo.build;
 
-import com.google.common.collect.Lists;
-import com.nirima.jenkins.repo.project.ProjectBuildList;
-import com.nirima.jenkins.repo.project.ProjectsElement;
-import com.nirima.jenkins.repo.virtual.AllSHA1RepositoryRoot;
-import com.nirima.jenkins.repo.virtual.VirtualRepositoryRoot;
-import hudson.model.BuildableItemWithBuildWrappers;
+import com.nirima.jenkins.repo.RepositoryDirectory;
+import com.nirima.jenkins.repo.util.IDirectoryPopulator;
 
-import java.util.Collection;
+public class SimpleOnDemandItem extends PopulateOnDemandDirectoryRepositoryItem {
+    private final IDirectoryPopulator populator;
 
-
-public class RootElement extends AbstractRepositoryDirectory implements RepositoryDirectory {
-
-    public RootElement() {
-        super(null);
+    public SimpleOnDemandItem(RepositoryDirectory parent, String item, IDirectoryPopulator populator) {
+        super(parent, item);
+        this.populator = populator;
     }
 
-    public Collection<? extends RepositoryElement> getChildren() {
-        return Lists.newArrayList(
-                new ProjectsElement(this),
-                new VirtualRepositoryRoot(this),
-                new AllSHA1RepositoryRoot(this)
-        );
+    @Override
+    protected IDirectoryPopulator getPopulator() {
+        return this.populator;
     }
-
-    public String getName() {
-        return "root";
-    }
-
-
 }
