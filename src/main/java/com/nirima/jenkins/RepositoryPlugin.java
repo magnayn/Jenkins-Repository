@@ -87,19 +87,13 @@ public class RepositoryPlugin extends Plugin {
                     if (currentItem instanceof RepositoryDirectory) {
                         RepositoryDirectory currentDirectory = (RepositoryDirectory) currentItem;
                         currentItem = currentDirectory.getChild(element);
-                    } else {
-                        rsp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                        return;
                     }
 
                 }
             }
 
-            try {
-                displayElement(req, rsp, currentItem);
-            } catch (Exception ex) {
-                rsp.sendError(HttpServletResponse.SC_NO_CONTENT);
-            }
+            displayElement(req, rsp, currentItem);
+
         } catch (Exception ex) {
             // try static content
             super.doDynamic(req, rsp);
