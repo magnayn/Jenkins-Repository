@@ -51,7 +51,7 @@ public class ArtifactRepositoryItem implements RepositoryContent {
     }
 
     public String getName() {
-        return artifact.fileName;
+        return artifact.canonicalName;
     }
 
     public RepositoryDirectory getParent() {
