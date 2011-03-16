@@ -46,6 +46,8 @@ public class DirectoryRepositoryItem extends AbstractRepositoryElement implement
 
     protected String name;
 
+    private MavenMetadataRepositoryItem metadata;
+
     public DirectoryRepositoryItem(RepositoryDirectory parent, String name) {
         super(parent);
         this.name = name;
@@ -95,6 +97,17 @@ public class DirectoryRepositoryItem extends AbstractRepositoryElement implement
         }
     }
 
+    public MavenMetadataRepositoryItem getMetadata()
+    {
+        if( metadata == null )
+        {
+            metadata = new MavenMetadataRepositoryItem();
+            metadata.setParent(this);
+            items.put( metadata.getName(), metadata );
+        }
+        return metadata;
+    }
+
     protected RepositoryElement add(RepositoryElement dirElement, boolean allowOverwrite)
     {
         if ( getItems().containsKey(dirElement.getName()) )
@@ -105,6 +118,14 @@ public class DirectoryRepositoryItem extends AbstractRepositoryElement implement
         }
         getItems().put(dirElement.getName(), dirElement);
         dirElement.setParent(this);
+
+        // Was it an artifact? If so we'll be needing metadata
+        if( dirElement instanceof ArtifactRepositoryItem )
+        {
+            getMetadata().addItemAsEntry((ArtifactRepositoryItem)dirElement);
+            ((DirectoryRepositoryItem)getParent()).getMetadata().addItemAsVersion((ArtifactRepositoryItem)dirElement);
+        }
+
         return dirElement;
     }
 

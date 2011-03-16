@@ -67,6 +67,11 @@ public class ArtifactRepositoryItem implements RepositoryContent {
         return directory.getPath() + "/" + getName();
     }
 
+    /* internal */ MavenArtifact getArtifact()
+    {
+        return this.artifact;
+    }
+
     public InputStream getContent() throws Exception {
         return new FileInputStream(getFile());
     }
