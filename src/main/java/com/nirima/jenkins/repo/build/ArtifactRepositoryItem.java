@@ -90,8 +90,19 @@ public class ArtifactRepositoryItem implements RepositoryContent {
 
     public File getFile()
     {
-        File f = new File(new File(new File(new File(build.getArtifactsDir(), artifact.groupId), artifact.artifactId), artifact.version), artifact.fileName);
-        return f;
+        File fPath = new File(new File(new File(build.getArtifactsDir(), artifact.groupId), artifact.artifactId), artifact.version);
+        File fArtifact;
+
+        fArtifact = new File(fPath, artifact.canonicalName);
+        if( fArtifact.exists() )
+            return fArtifact;
+
+
+        fArtifact = new File(fPath, artifact.fileName);
+        if( fArtifact.exists() )
+            return fArtifact;
+
+        throw new IllegalStateException("Maven artifact cannot be found with name or canonicalName - " + artifact);
     }
 
     /**
