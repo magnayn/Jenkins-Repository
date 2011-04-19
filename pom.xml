@@ -13,7 +13,7 @@
     <description>This plug-in exposes project builds as a maven repository so the artifacts can be picked up by
         downstream builds or other systems.
     </description>
-    <version>0.4</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Jenkins+Maven+Repository+Server</url>
