@@ -93,6 +93,9 @@ public class MavenMetadataRepositoryItem implements RepositoryContent {
             metadata.setGroupId( item.groupId );
             metadata.setArtifactId(item.artifactId);
             metadata.setVersion( item.version );
+            Versioning v = new Versioning();
+            metadata.setVersioning(v);
+            v.setLastUpdatedTimestamp(new Date());
         }
     }
 
