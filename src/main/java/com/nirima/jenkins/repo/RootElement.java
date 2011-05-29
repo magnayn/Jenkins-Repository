@@ -29,7 +29,9 @@ import com.nirima.jenkins.repo.project.ProjectsElement;
 import com.nirima.jenkins.repo.virtual.AllSHA1RepositoryRoot;
 import com.nirima.jenkins.repo.virtual.VirtualRepositoryRoot;
 import hudson.model.BuildableItemWithBuildWrappers;
+import org.apache.maven.model.Repository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -40,11 +42,19 @@ public class RootElement extends AbstractRepositoryDirectory implements Reposito
     }
 
     public Collection<? extends RepositoryElement> getChildren() {
-        return Lists.newArrayList(
-                new ProjectsElement(this),
-                new VirtualRepositoryRoot(this),
-                new AllSHA1RepositoryRoot(this)
-        );
+
+        Collection<RepositoryElement> children = new ArrayList<RepositoryElement>();
+
+        // Default set
+        children.add( new ProjectsElement(this) );
+        children.add( new VirtualRepositoryRoot(this) );
+        children.add( new AllSHA1RepositoryRoot(this) );
+
+        for(RepositoryExtensionPoint r : RepositoryExtensionPoint.all()) {
+            children.add( r.getRepositoryRoot(this) );
+        }
+
+        return children;
     }
 
     public String getName() {
