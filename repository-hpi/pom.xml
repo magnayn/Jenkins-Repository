@@ -1,0 +1,97 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.nirima.jenkins.repository</groupId>
+        <artifactId>pom</artifactId>
+        <version>0.6-SNAPSHOT</version>
+    </parent>
+
+    <groupId>jenkins</groupId>
+    <artifactId>repository</artifactId>
+    <name>Jenkins Maven Repository Server Plugin</name>
+    <description>This plug-in exposes project builds as a maven repository so the artifacts can be picked up by
+        downstream builds or other systems.
+    </description>
+    <version>0.6-SNAPSHOT</version>
+    <packaging>hpi</packaging>
+
+    <url>http://wiki.jenkins-ci.org/display/JENKINS/Jenkins+Maven+Repository+Server</url>
+
+
+    <scm>
+        <connection>scm:git:git://github.com/magnayn/Jenkins-Repository.git</connection>
+        <developerConnection>scm:git:git@github.com:magnayn/Jenkins-Repository.git</developerConnection>
+    </scm>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
+
+                    <execution>
+                        <id>copy-the-source</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+
+                            <source>
+                               String target = "${basedir}/target/classes/tools/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}";
+                               String src = "${settings.localRepository}/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}";
+
+                                def a = new AntBuilder();
+                                a.mkdir(dir:target);
+
+                                a.copy(todir: target) {
+                                  fileset(dir:src, includes:"*.jar")
+                                }
+                                a.copy(todir: target) {
+                                  fileset(dir:src, includes:"*.pom")
+                                }
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.jvnet.hudson.plugins</groupId>
+            <artifactId>git</artifactId>
+            <version>1.1.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.main</groupId>
+            <version>1.417</version>
+            <artifactId>maven-plugin</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.collections</groupId>
+            <artifactId>google-collections</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>token-macro</artifactId>
+            <version>1.2</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.nirima.jenkins.repository</groupId>
+            <artifactId>jenkins-maven-plugin</artifactId>
+            <version>${pom.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+    </dependencies>
+
+
+</project>
