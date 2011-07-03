@@ -29,14 +29,14 @@ import com.nirima.jenkins.webdav.interfaces.IMethod;
 import com.nirima.jenkins.webdav.interfaces.MethodException;
 import com.nirima.jenkins.xml.XmlSerializerException;
 import com.nirima.jenkins.xml.XmlSerializerFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,8 +62,6 @@ public class MethodBase implements IMethod {
     protected IDavContext getDavContext() {
         return m_ctx;
     }
-
-    // protected IWebDAVService m_locator;
 
     public void invoke() throws MethodException {
         invoke(m_ctx);
@@ -138,8 +136,19 @@ public class MethodBase implements IMethod {
             return null;
         }
 
-        XMLStreamReader xpp = XmlSerializerFactory.createXMLStreamReader(m_request.getReader());
+        Reader r = m_request.getReader();
+        /** Debugging
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+        IOUtils.copy(r, baos);
+
+        System.out.println("Content:" + new String(baos.toByteArray() ) + ":");
+
+        ByteArrayInputStream bais = new ByteArrayInputStream( baos.toByteArray() );
+
+        XMLStreamReader xpp = XmlSerializerFactory.createXMLStreamReader(bais);
+        **/
+        XMLStreamReader xpp = XmlSerializerFactory.createXMLStreamReader(r);
         return xpp;
 
     }
@@ -270,6 +279,10 @@ public class MethodBase implements IMethod {
 
     protected String getPath() {
         return m_path;
+    }
+
+    protected String getUrl() {
+        return m_baseUrl + m_path;
     }
 
     protected HttpServletRequest getRequest() {

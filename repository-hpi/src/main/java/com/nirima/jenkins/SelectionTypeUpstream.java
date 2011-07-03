@@ -21,26 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.nirima.jenkins.webdav.impl.methods;
-import com.nirima.jenkins.webdav.interfaces.*;
-import org.apache.commons.io.IOUtils;
+package com.nirima.jenkins;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import hudson.Extension;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * @author nigelm
+ * Created by IntelliJ IDEA.
+ * User: magnayn
+ * Date: 01/07/2011
+ * Time: 17:41
+ * To change this template use File | Settings | File Templates.
  */
-public class Get extends Head {
-
-    @Override
-    protected void writeContent(IDavFile fileItem) throws IOException {
-        InputStream is = fileItem.getContent();
-        BufferedOutputStream os = new BufferedOutputStream(this.getResponse().getOutputStream());
-
-        IOUtils.copy(is, os);
-        os.flush();
-        is.close();
+public class SelectionTypeUpstream extends SelectionType  {
+    String buildId;
+    @DataBoundConstructor
+    public SelectionTypeUpstream(String buildId) {
+        this.buildId = buildId;
     }
+
+    public String getBuildId() {
+        return buildId;
+    }
+
+    public void setBuildId(String buildId) {
+        this.buildId = buildId;
+    }
+
+
+
+    @Extension
+    public static final class DescriptorImpl extends Descriptor<SelectionType> {
+
+         @Override
+         public String getDisplayName() {
+             return "Upstream Project that triggered this build";  //To change body of implemented methods use File | Settings | File Templates.
+         }
+     }
 }

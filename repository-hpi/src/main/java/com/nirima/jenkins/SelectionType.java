@@ -21,26 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.nirima.jenkins.webdav.impl.methods;
-import com.nirima.jenkins.webdav.interfaces.*;
-import org.apache.commons.io.IOUtils;
+package com.nirima.jenkins;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
+import hudson.model.Hudson;
+import hudson.plugins.git.util.BuildChooserDescriptor;
+import jenkins.model.Jenkins;
 
-/**
- * @author nigelm
- */
-public class Get extends Head {
+import java.io.Serializable;
 
-    @Override
-    protected void writeContent(IDavFile fileItem) throws IOException {
-        InputStream is = fileItem.getContent();
-        BufferedOutputStream os = new BufferedOutputStream(this.getResponse().getOutputStream());
 
-        IOUtils.copy(is, os);
-        os.flush();
-        is.close();
+public abstract class SelectionType implements Describable<SelectionType>, Serializable {
+    public Descriptor getDescriptor() {
+        return Jenkins.getInstance().getDescriptorOrDie(getClass());
     }
 }

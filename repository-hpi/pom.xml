@@ -39,17 +39,19 @@
                         <configuration>
 
                             <source>
-                               String target = "${basedir}/target/classes/tools/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}";
-                               String src = "${settings.localRepository}/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}";
+                                String target =
+                                "${basedir}/target/classes/tools/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}";
+                                String src =
+                                "${settings.localRepository}/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}";
 
                                 def a = new AntBuilder();
                                 a.mkdir(dir:target);
 
                                 a.copy(todir: target) {
-                                  fileset(dir:src, includes:"*.jar")
+                                fileset(dir:src, includes:"*.jar")
                                 }
                                 a.copy(todir: target) {
-                                  fileset(dir:src, includes:"*.pom")
+                                fileset(dir:src, includes:"*.pom")
                                 }
                             </source>
                         </configuration>
@@ -82,6 +84,12 @@
             <artifactId>token-macro</artifactId>
             <version>1.2</version>
             <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jenkins-ci.plugins</groupId>
+                    <artifactId>maven-plugin</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

@@ -47,12 +47,25 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 
 import hudson.plugins.git.util.BuildData;
 
 
 @Extension
-public class RepositoryPlugin extends Plugin {
+public class RepositoryPlugin extends Plugin implements RootAction, Serializable {
+    public String getIconFileName() {
+        return "/plugin/repository/static/icons/repository-32x32.png";
+    }
+
+    public String getDisplayName() {
+        return "Maven Repository";
+    }
+
+    public String getUrlName() {
+        return "plugin/repository";
+    }
+
     private ServletContext context;
 
     private IMethodFactory methodFactory = new MethodFactory();
@@ -83,9 +96,11 @@ public class RepositoryPlugin extends Plugin {
             return;
         }
 
-        String root = fullPath.substring(0, fullPath.length() - path.length());
+        if( path.startsWith("/static") ) {
+            super.doDynamic(req, rsp);
+            return;
+        }
 
-        //
         try
         {
             IDavRepo repo = new BridgeRepository(null);
@@ -107,32 +122,7 @@ public class RepositoryPlugin extends Plugin {
             throw new RuntimeException(e);
         }
 
-        //
-        /*
-        RepositoryElement currentItem = new RootElement();
 
-        // Split into sections
-        String[] pathElements = path.substring(1).split("/");
-
-        try {
-            // Ignore breakdown case if '/'
-            if (pathElements.length > 1 || pathElements[0].length() > 0) {
-                for (String element : pathElements) {
-                    if (currentItem instanceof RepositoryDirectory) {
-                        RepositoryDirectory currentDirectory = (RepositoryDirectory) currentItem;
-                        currentItem = currentDirectory.getChild(element);
-                    }
-
-                }
-            }
-
-            displayElement(req, rsp, currentItem);
-
-        } catch (Exception ex) {
-            // try static content
-            super.doDynamic(req, rsp);
-        }
-        */
     }
 
     private void displayElement(StaplerRequest req, StaplerResponse rsp, RepositoryElement currentItem) throws Exception {

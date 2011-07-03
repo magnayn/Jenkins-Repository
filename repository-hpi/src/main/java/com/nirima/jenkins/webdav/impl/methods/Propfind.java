@@ -98,7 +98,11 @@ public class Propfind extends MethodBase {
 
     protected void invokeInternal(IDavContext ctxt) throws IOException, MethodException, XMLStreamException {
 
-        IDavItem topLevelItem = getRepo().getItem(getDavContext(), this.getPath());
+        IDavItem topLevelItem;
+
+        topLevelItem = getRepo().getItem(getDavContext(), this.getPath());
+
+
         if (topLevelItem == null) {
             this.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;

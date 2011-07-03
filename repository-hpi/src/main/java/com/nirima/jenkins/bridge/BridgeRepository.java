@@ -28,12 +28,14 @@ import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
 import com.nirima.jenkins.repo.RootElement;
 import com.nirima.jenkins.webdav.interfaces.*;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 
 public class BridgeRepository implements IDavRepo {
+    private static final Logger log = Logger.getLogger(BridgeRepository.class);
 
     IMimeTypeResolver mimeTypeResolver;
     RootElement rootElement = new RootElement();
@@ -45,26 +47,34 @@ public class BridgeRepository implements IDavRepo {
 
     public IDavItem getItem(IDavContext ctxt, String path) {
 
-        RepositoryElement currentItem = rootElement;
+        try
+        {
+            RepositoryElement currentItem = rootElement;
 
-        // Split into sections
-        String[] pathElements = path.substring(1).split("/");
+
+            // Split into sections
+            String[] pathElements = path.substring(1).split("/");
 
 
-        // Ignore breakdown case if '/'
-        if (pathElements.length > 1 || pathElements[0].length() > 0) {
-            for (String element : pathElements) {
-                if (currentItem instanceof RepositoryDirectory) {
-                    RepositoryDirectory currentDirectory = (RepositoryDirectory) currentItem;
-                    currentItem = currentDirectory.getChild(element);
+            // Ignore breakdown case if '/'
+            if (pathElements.length > 1 || pathElements[0].length() > 0) {
+                for (String element : pathElements) {
+                    if (currentItem instanceof RepositoryDirectory) {
+                        RepositoryDirectory currentDirectory = (RepositoryDirectory) currentItem;
+                        currentItem = currentDirectory.getChild(element);
+                    }
+
                 }
-
             }
+
+            return bridge(currentItem);
+        }
+        catch(Exception ex)
+        {
+            log.error("No such repository path " + path);
+            return null;
         }
 
-        return bridge(currentItem);
-
-            //displayElement(req, rsp, currentItem);
 
 
     }

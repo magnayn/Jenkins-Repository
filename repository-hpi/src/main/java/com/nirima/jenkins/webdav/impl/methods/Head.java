@@ -70,7 +70,16 @@ public class Head extends MethodBase {
             }
 
             if (item instanceof IDavCollection) {
+                if( !getPath().endsWith("/") )
+                {
+                    // Restate the proper location
+                   this.getResponse().setHeader("Location", getUrl() + "/");
+                   this.getResponse().setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+                   return;
+                }
+
                 generateDirectoryListing(ctxt, (IDavCollection) item);
+
                 return;
             }
 
@@ -112,21 +121,18 @@ public class Head extends MethodBase {
                 IDavFile file = (IDavFile) cItem;
 
                 writer.write("<TD>" + Long.toString(file.getContentLength()) + "</TD>");
-                name = item.getName()==null?"":item.getName() + "/";
-                name += file.getName();
 
-                writer.write("<TD><A href='" +  name + "'>" + file.getName() + "</A></TD>");
+                writer.write("<TD><A href='" +  file.getName() + "'>" + file.getName() + "</A></TD>");
                 if (file.isLocked(ctxt))
                     writer.write("<TD>(Locked)</TD>");
                 else
                     writer.write("<TD></TD>");
             } else {
                 IDavCollection dir = (IDavCollection) cItem;
-                name = item.getName()==null?"":item.getName() + "/";
-                name += dir.getName();
+
 
                 writer.write("<TD>DIR</TD>");
-                writer.write("<TD><A href='" + name + "'>" + dir.getName() + "</A></TD>");
+                writer.write("<TD><A href='" + dir.getName() + "/'>" + dir.getName() + "</A></TD>");
                 writer.write("<TD></TD>");
             }
             writer.write("</TR>");

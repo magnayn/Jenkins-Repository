@@ -173,15 +173,15 @@ public class SimpleArtifactCopier implements IArtifactCopier {
 
         List<String> entries = null;
 
-        URL url = new URL(host, art.getGroupId().replace('.','/') + "/" + art.getArtifactId() + "/" + art.getVersion());
+        URL url = new URL(host, art.getGroupId().replace('.','/') + "/" + art.getArtifactId() + "/" + art.getVersion() + "/");
 
         //url = new URL(url, "LastSuccessful/repository");
         BasicHttpEntityEnclosingRequest httpget = new BasicHttpEntityEnclosingRequest("PROPFIND", url.toURI().getPath());
-
+        //System.out.println("url=" + url);
         // HEADER
         String s = "<propget><allprop/></propget>";
         StringEntity se = new StringEntity(s, "US-ASCII");
-        se.setChunked(true);
+        se.setChunked(false);
         httpget.setEntity(se);
 
         // Start
@@ -250,7 +250,7 @@ public class SimpleArtifactCopier implements IArtifactCopier {
 
             Node ref = XPathAPI.selectSingleNode(n, "a:href");
             Node type = XPathAPI.selectSingleNode(n, "a:propstat/a:prop/a:resourcetype").getFirstChild();
-            System.out.println(ref.getTextContent());
+            //System.out.println(ref.getTextContent());
 //
 //            System.out.println(type);
 

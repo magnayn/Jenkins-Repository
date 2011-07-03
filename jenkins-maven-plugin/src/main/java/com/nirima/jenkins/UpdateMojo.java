@@ -24,7 +24,6 @@
 package com.nirima.jenkins;
 
 
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
@@ -33,6 +32,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
@@ -52,20 +53,6 @@ public class UpdateMojo
      * @readonly
      */
     private ArtifactRepository localRepository;
-//
-//    /**
-//	     * @component
-//	     */
-//	    private ArtifactDeployer deployer;
-//
-//    /** @component */
-//    private ArtifactInstaller installer;
-//
-//    /**
-//            * @component
-//            */
-//           private ArtifactResolver resolver;
-
 
     /**
      * Map that contains the layouts.
@@ -73,13 +60,6 @@ public class UpdateMojo
      * @component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout"
      */
     private Map repositoryLayouts;
-
-//    /**
-//	     * Component used to create a repository.
-//	     *
-//	     * @component
-//	     */
-//	    ArtifactRepositoryFactory repositoryFactory;
 
     /**
      * Location of the file.
@@ -93,6 +73,13 @@ public class UpdateMojo
      * @parameter expression="${project.ciManagement.url}"
      */
     private URL jenkinsUrl;
+
+    /**
+     * Any Object to print out.
+     *
+     * @parameter expression="${jenkins.url}"
+     */
+    private String url;
 
     /**
      * @parameter expression="${basedir}"
@@ -125,18 +112,20 @@ public class UpdateMojo
 
     public void execute()
             throws MojoExecutionException {
-
-
         try {
-            if (jenkinsUrl == null || jenkinsUrl.toURI().toString().length() == 0) {
-                throw new MojoExecutionException("You must specify a Jenkins URL in the ciManagement section of your POM.");
+
+            if (url != null && url.length() > 0) {
+                jenkinsUrl = new URL(url);
             }
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            throw new MojoExecutionException("Error in CI Settings");
-        }
-        try {
 
+            try {
+                if (jenkinsUrl == null || jenkinsUrl.toURI().toString().length() == 0) {
+                    throw new MojoExecutionException("You must specify a Jenkins URL in the ciManagement section of your POM.");
+                }
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+                throw new MojoExecutionException("Error in CI Settings");
+            }
 
             GitStatus.Status status = gitStatus.getStatus(sourceDirectory);
 
@@ -145,9 +134,13 @@ public class UpdateMojo
                 firstDirty = artifactId;
             }
 
-            URL url = new URL(jenkinsUrl, "plugin/repository/SHA1/" + status.sha1.name() + "/repository");
+            if (!jenkinsUrl.toString().endsWith("/")) {
+                jenkinsUrl = new URL(jenkinsUrl.toString() + "/");
+            }
 
-            System.out.println("Remote URL " + url.toExternalForm());
+            URL url = new URL(jenkinsUrl, "plugin/repository/SHA1/" + status.sha1.name() + "/repository/");
+
+            //System.out.println("Remote URL " + url.toExternalForm());
 
             File repo = new File(localRepository.getBasedir());
 
@@ -155,21 +148,18 @@ public class UpdateMojo
 
             Artifact art = project.getArtifact();
 
-            try
-            {
+            try {
                 ac.updateAll(art);
-            }
-            catch(Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new MojoExecutionException("Could not update to latest version from url " + url);
             }
 
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new MojoExecutionException("Error determining version", e);
+        } catch (URISyntaxException e) {
+            throw new MojoExecutionException("URL error", e);
+        } catch (MalformedURLException e) {
+            throw new MojoExecutionException("URL error", e);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error fetching data", e);
         }
-
-
     }
 }
