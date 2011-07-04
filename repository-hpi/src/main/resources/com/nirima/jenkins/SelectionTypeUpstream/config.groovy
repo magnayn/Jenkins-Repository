@@ -9,8 +9,8 @@ f=namespace("/lib/form")
 
 f.entry(title:_("Build"), field:"build") {
      select(name:"build") {
-        option(value:"repository", _("LastSuccessful / repository"))
-        option(value:"repositoryChain", _("LastSuccessful / repositoryChain"))
+        f.option(selected:instance?.build=="repository", value:"repository", _("LastSuccessful / repository"))
+        f.option(selected:instance?.build=="repositoryChain", value:"repositoryChain", _("LastSuccessful / repositoryChain"))
     }
 }
 

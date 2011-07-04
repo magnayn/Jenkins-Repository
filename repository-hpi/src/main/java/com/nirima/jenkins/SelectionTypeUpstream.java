@@ -24,40 +24,67 @@
 package com.nirima.jenkins;
 
 import hudson.Extension;
-import hudson.model.Describable;
-import hudson.model.Descriptor;
+import hudson.model.*;
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-/**
- * Created by IntelliJ IDEA.
- * User: magnayn
- * Date: 01/07/2011
- * Time: 17:41
- * To change this template use File | Settings | File Templates.
- */
-public class SelectionTypeUpstream extends SelectionType  {
-    String buildId;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+
+public class SelectionTypeUpstream extends SelectionType {
+    public String build;
+
     @DataBoundConstructor
-    public SelectionTypeUpstream(String buildId) {
-        this.buildId = buildId;
+    public SelectionTypeUpstream(String build) {
+        this.build = build;
     }
 
-    public String getBuildId() {
-        return buildId;
+    public String getBuild() {
+        return build;
     }
 
-    public void setBuildId(String buildId) {
-        this.buildId = buildId;
+    public void setBuild(String buildId) {
+        this.build = build;
     }
 
+    @Override
+    public URL getUrl(AbstractBuild b) throws MalformedURLException, RepositoryDoesNotExistException {
+        URL url = new URL(Jenkins.getInstance().getRootUrl());
 
+        url = new URL(url, "plugin/repository/project/");
+
+
+        // What is the upstream project name?
+        Cause.UpstreamCause theCause = (Cause.UpstreamCause) b.getCause(Cause.UpstreamCause.class);
+        String theProject;
+        String theBuild;
+        if (theCause == null) {
+            ParametersAction action = b.getAction(ParametersAction.class);
+            if (action == null) {
+                throw new RepositoryDoesNotExistException();
+            }
+            RunParameterValue value = (RunParameterValue) action.getParameter("Upstream");
+
+            theProject = value.getJobName();
+            theBuild = value.getNumber();
+        } else {
+            theProject = theCause.getUpstreamProject();
+            theBuild = "" + theCause.getUpstreamBuild();
+        }
+        url = new URL(url, theProject + "/");
+
+        url = addBuildId(url, this.build);
+
+        return url;
+    }
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<SelectionType> {
 
-         @Override
-         public String getDisplayName() {
-             return "Upstream Project that triggered this build";  //To change body of implemented methods use File | Settings | File Templates.
-         }
-     }
+        @Override
+        public String getDisplayName() {
+            return "Upstream Project that triggered this build";  //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
 }

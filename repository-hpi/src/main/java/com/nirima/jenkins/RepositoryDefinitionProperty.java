@@ -25,10 +25,11 @@ package com.nirima.jenkins;
 
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
 import hudson.tasks.BuildWrapper;
 import hudson.tasks.BuildWrapperDescriptor;
-import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.export.ExportedBean;
 
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 
 @ExportedBean
@@ -80,64 +80,16 @@ public class RepositoryDefinitionProperty extends BuildWrapper implements Serial
                 super.buildEnvVars(env);    //To change body of overridden methods use File | Settings | File Templates.
 
                 try {
-                    URL url = new URL(Jenkins.getInstance().getRootUrl());
-
-                    url = new URL(url, "plugin/repository/project/");
-
-                    if (upstream instanceof SelectionTypeUpstream ) {
-                        // What is the upstream project name?
-                        Cause.UpstreamCause theCause = (Cause.UpstreamCause)build.getCause(Cause.UpstreamCause.class);
-                        String theProject;
-                        String theBuild;
-                        if (theCause == null) {
-                            ParametersAction action = build.getAction(ParametersAction.class);
-                            if( action == null )
-                            {
-                                listener.getLogger().print("You asked for an upstream repository, but it does not exist");
-                                return;
-                            }
-                            RunParameterValue value = (RunParameterValue) action.getParameter("Upstream");
-
-                            theProject = value.getJobName();
-                            theBuild   = value.getNumber();
-                        } else {
-                            theProject = theCause.getUpstreamProject();
-                            theBuild = "" + theCause.getUpstreamBuild();
-                        }
-                        url = new URL(url, theProject);
-                    } else if(upstream instanceof SelectionTypeSpecified) {
-                        url = new URL(url, ((SelectionTypeSpecified)upstream).path);
-                    } else {
-                        // Specific
-                        url = new URL(url, ((SelectionTypeProject)upstream).project);
-                    }
-
-                    url = addBuildId(url, upstream);
-
+                    URL url = upstream.getUrl(build);
                     env.put("Jenkins.Repository", url.toExternalForm());
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                } catch (SelectionType.RepositoryDoesNotExistException x) {
+                    listener.getLogger().print("You asked for an upstream repository, but it does not exist");
+                    throw new RuntimeException(x);
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
                 }
+
             }
-
-            private URL addBuildId(URL url, SelectionType upstream) throws MalformedURLException {
-                String buildId = null;
-                if( upstream instanceof SelectionTypeUpstream)
-                    buildId = ((SelectionTypeUpstream)upstream).buildId;
-                else if( upstream instanceof SelectionTypeProject)
-                    buildId = ((SelectionTypeProject)upstream).buildId;
-
-                if( buildId == null )
-                    return url;
-
-                if ( "repository".equalsIgnoreCase("repository"))
-                        url = new URL(url, "LastSuccessful/repository/");
-                    else
-                        url = new URL(url, "LastSuccessful/repositoryChain/");
-
-                return url;
-            }
-
         };
     }
 

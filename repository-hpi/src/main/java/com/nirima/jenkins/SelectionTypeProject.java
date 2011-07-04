@@ -24,32 +24,26 @@
 package com.nirima.jenkins;
 
 import hudson.Extension;
+import hudson.model.AbstractBuild;
 import hudson.model.BuildableItemWithBuildWrappers;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
-import hudson.plugins.git.util.BuildChooserDescriptor;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: magnayn
- * Date: 01/07/2011
- * Time: 17:41
- * To change this template use File | Settings | File Templates.
- */
+
 public class SelectionTypeProject extends SelectionType {
     public String project;
-    public String buildId;
+    public String build;
 
     @DataBoundConstructor
-    public SelectionTypeProject(String project, String buildId) {
+    public SelectionTypeProject(String project, String build) {
         this.project = project;
-        this.buildId = buildId;
+        this.build = build;
     }
-
 
 
     public String getProject() {
@@ -60,12 +54,27 @@ public class SelectionTypeProject extends SelectionType {
         this.project = project;
     }
 
-    public String getBuildId() {
-        return buildId;
+    public String getBuild() {
+        return build;
     }
 
-    public void setBuildId(String buildId) {
-        this.buildId = buildId;
+    public void setBuild(String buildId) {
+        this.build = buildId;
+    }
+
+    @Override
+    public URL getUrl(AbstractBuild theBuild) throws MalformedURLException, RepositoryDoesNotExistException {
+        URL url = new URL(Jenkins.getInstance().getRootUrl());
+
+        url = new URL(url, "plugin/repository/project/");
+
+        // Specific
+        url = new URL(url, project + "/");
+
+
+        url = addBuildId(url, build);
+
+        return url;
     }
 
     @Extension
