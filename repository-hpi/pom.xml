@@ -19,10 +19,7 @@
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Jenkins+Maven+Repository+Server</url>
 
 
-    <scm>
-        <connection>scm:git:git://github.com/magnayn/Jenkins-Repository.git</connection>
-        <developerConnection>scm:git:git@github.com:magnayn/Jenkins-Repository.git</developerConnection>
-    </scm>
+
     <build>
         <plugins>
             <plugin>

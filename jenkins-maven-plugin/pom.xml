@@ -11,17 +11,8 @@
   <packaging>maven-plugin</packaging>
   <name>jenkins-maven-plugin Maven Mojo</name>
   <description>Jenkins Maven Mojo</description>
-  <url>http://none</url>
-  <licenses>
-    <license>
-      <name>MIT</name>
-      <url>URL</url>
-    </license>
-  </licenses>
-  <scm>
-    <connection>none</connection>
-    <url>none</url>
-  </scm>
+
+
   <properties>
     <aetherVersion>1.7</aetherVersion>
     <mavenVersion>3.0.3</mavenVersion>

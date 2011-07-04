@@ -27,7 +27,10 @@
           <name>MIT</name>
        </license>
     </licenses>
-
+    <scm>
+        <connection>scm:git:git://github.com/magnayn/Jenkins-Repository.git</connection>
+        <developerConnection>scm:git:git@github.com:magnayn/Jenkins-Repository.git</developerConnection>
+    </scm>
     <modules>
         <module>repository-hpi</module>
         <module>jenkins-maven-plugin</module>
