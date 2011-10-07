@@ -55,15 +55,23 @@ public class DirectoryPopulatorVisitor extends HudsonVisitor {
         ArtifactRepositoryItem repositoryItem = new ArtifactRepositoryItem(build, mavenArtifact);
         root.insert(repositoryItem, repositoryItem.getArtifactPath(), allowOverwrite);
 
-        String key = mavenArtifact.groupId + ":" + mavenArtifact.artifactId;
-        MetadataRepositoryItem mdi = metadata.get(key);
-        if (mdi == null) {
-            metadata.put(key, mdi = new MetadataRepositoryItem(build));
+        // add this artifact to the artifactId directory metadata
+        String dirKey = mavenArtifact.groupId + ":" + mavenArtifact.artifactId;
+        MetadataRepositoryItem dirItem = metadata.get(dirKey);
+        if (dirItem == null) {
+            metadata.put(dirKey, dirItem = new MetadataRepositoryItem(build));
             String path = mavenArtifact.groupId.replace('.','/') + "/" +
                 mavenArtifact.artifactId + "/maven-metadata.xml";
-            root.insert(mdi, path, allowOverwrite);
+            root.insert(dirItem, path, allowOverwrite);
         }
-        mdi.addArtifact(mavenArtifact, repositoryItem);
+        dirItem.addArtifact(mavenArtifact, repositoryItem);
+
+        // and also add a metadata item for this version of this artifact
+        MetadataRepositoryItem item = new MetadataRepositoryItem(build);
+        item.addArtifact(mavenArtifact, repositoryItem);
+        String path = mavenArtifact.groupId.replace('.','/') + "/" + mavenArtifact.artifactId +
+            "/" + mavenArtifact.version + "/maven-metadata.xml";
+        root.insert(item, path, allowOverwrite);
     }
 
     protected Map<String,MetadataRepositoryItem> metadata =

@@ -108,6 +108,9 @@ public class MetadataRepositoryItem implements RepositoryContent {
         buf.append("<metadata>\n");
         buf.append("  <groupId>" + groupId + "</groupId>\n");
         buf.append("  <artifactId>" + artifactId + "</artifactId>\n");
+        if (versions.size() == 1) {
+            buf.append("  <version>" + versions.iterator().next() + "</version>\n");
+        }
         buf.append("  <versioning>\n");
         buf.append("    <versions>\n");
         for (String version : versions) {
