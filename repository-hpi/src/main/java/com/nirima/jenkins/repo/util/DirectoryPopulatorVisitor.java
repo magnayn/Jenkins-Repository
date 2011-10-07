@@ -23,9 +23,9 @@
  */
 package com.nirima.jenkins.repo.util;
 
-import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.build.ArtifactRepositoryItem;
 import com.nirima.jenkins.repo.build.DirectoryRepositoryItem;
+import com.nirima.jenkins.repo.build.MetadataRepositoryItem;
 import hudson.maven.MavenBuild;
 import hudson.maven.MavenModule;
 import hudson.maven.MavenModuleSetBuild;
@@ -33,7 +33,7 @@ import hudson.maven.reporters.MavenArtifact;
 import hudson.maven.reporters.MavenArtifactRecord;
 import hudson.model.Run;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -54,5 +54,18 @@ public class DirectoryPopulatorVisitor extends HudsonVisitor {
     {
         ArtifactRepositoryItem repositoryItem = new ArtifactRepositoryItem(build, mavenArtifact);
         root.insert(repositoryItem, repositoryItem.getArtifactPath(), allowOverwrite);
+
+        String key = mavenArtifact.groupId + ":" + mavenArtifact.artifactId;
+        MetadataRepositoryItem mdi = metadata.get(key);
+        if (mdi == null) {
+            metadata.put(key, mdi = new MetadataRepositoryItem(build));
+            String path = mavenArtifact.groupId.replace('.','/') + "/" +
+                mavenArtifact.artifactId + "/maven-metadata.xml";
+            root.insert(mdi, path, allowOverwrite);
+        }
+        mdi.addArtifact(mavenArtifact, repositoryItem);
     }
+
+    protected Map<String,MetadataRepositoryItem> metadata =
+        new HashMap<String,MetadataRepositoryItem>();
 }
