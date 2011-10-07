@@ -56,8 +56,12 @@ public class MetadataRepositoryItem implements RepositoryContent {
     public void addArtifact(MavenArtifact artifact, ArtifactRepositoryItem item) {
         this.groupId = artifact.groupId;
         this.artifactId = artifact.artifactId;
-        this.versions.add(artifact.version);
-        this.lastModified = Math.max(lastModified, item.getLastModified().getTime());
+        try {
+            this.lastModified = Math.max(lastModified, item.getLastModified().getTime());
+            this.versions.add(artifact.version);
+        } catch (IllegalStateException ise) {
+            // the artifact in question does not exist (it was probably pruned); ignore it
+        }
     }
 
     public String getName() {
