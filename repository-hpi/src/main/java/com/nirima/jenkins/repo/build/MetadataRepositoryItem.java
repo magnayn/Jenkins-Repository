@@ -23,13 +23,9 @@
  */
 package com.nirima.jenkins.repo.build;
 
-import com.nirima.jenkins.repo.RepositoryContent;
 import hudson.maven.MavenBuild;
 import hudson.maven.reporters.MavenArtifact;
-import com.nirima.jenkins.repo.RepositoryDirectory;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -38,14 +34,13 @@ import java.util.Set;
 /**
  * Represent a {@code maven-metadata.xml} file.
  */
-public class MetadataRepositoryItem implements RepositoryContent {
+public class MetadataRepositoryItem extends TextRepositoryItem {
 
     private long lastModified = 0L;
     private String groupId;
     private String artifactId;
     private Set<String> versions = new HashSet<String>();
 
-    private RepositoryDirectory directory;
     private MavenBuild build;
 
     public MetadataRepositoryItem(MavenBuild build)
@@ -68,41 +63,16 @@ public class MetadataRepositoryItem implements RepositoryContent {
         return "maven-metadata.xml";
     }
 
-    public RepositoryDirectory getParent() {
-        return directory;
-    }
-
-    public void setParent(RepositoryDirectory parent)
-    {
-        this.directory = parent;
-    }
-
-    public String getPath() {
-        return directory.getPath() + "/" + getName();
-    }
-
-    public InputStream getContent() throws Exception {
-        return new ByteArrayInputStream(formatMetadata().getBytes());
-    }
-
     public Date getLastModified() {
         return new Date(lastModified);
-    }
-
-    public Long getSize() {
-        return (long)formatMetadata().length();
     }
 
     public String getDescription() {
         return "From Build #" + build.getNumber() + " of " + build.getParentBuild().getParent().getName();
     }
 
-    public String getContentType()
-    {
-        return "text/plain";
-    }
-
-    private String formatMetadata() {
+    @Override
+    protected String generateContent() {
         StringBuilder buf = new StringBuilder();
         buf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         buf.append("<metadata>\n");

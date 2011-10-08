@@ -25,6 +25,7 @@ package com.nirima.jenkins.repo.util;
 
 import com.nirima.jenkins.repo.build.ArtifactRepositoryItem;
 import com.nirima.jenkins.repo.build.DirectoryRepositoryItem;
+import com.nirima.jenkins.repo.build.MetadataChecksumRepositoryItem;
 import com.nirima.jenkins.repo.build.MetadataRepositoryItem;
 import hudson.maven.MavenBuild;
 import hudson.maven.MavenModule;
@@ -62,7 +63,7 @@ public class DirectoryPopulatorVisitor extends HudsonVisitor {
             metadata.put(dirKey, dirItem = new MetadataRepositoryItem(build));
             String path = mavenArtifact.groupId.replace('.','/') + "/" +
                 mavenArtifact.artifactId + "/maven-metadata.xml";
-            root.insert(dirItem, path, allowOverwrite);
+            addMetadataItem(dirItem, path);
         }
         dirItem.addArtifact(mavenArtifact, repositoryItem);
 
@@ -71,9 +72,18 @@ public class DirectoryPopulatorVisitor extends HudsonVisitor {
         item.addArtifact(mavenArtifact, repositoryItem);
         String path = mavenArtifact.groupId.replace('.','/') + "/" + mavenArtifact.artifactId +
             "/" + mavenArtifact.version + "/maven-metadata.xml";
-        root.insert(item, path, allowOverwrite);
+        addMetadataItem(item, path);
     }
 
-    protected Map<String,MetadataRepositoryItem> metadata =
+    private void addMetadataItem(MetadataRepositoryItem item, String path) {
+        root.insert(item, path, allowOverwrite);
+        // add checksums for the item as well
+        root.insert(new MetadataChecksumRepositoryItem("md5", item),
+                    path + ".md5", allowOverwrite);
+        root.insert(new MetadataChecksumRepositoryItem("sha1", item),
+                    path + ".sha1", allowOverwrite);
+    }
+
+    private Map<String,MetadataRepositoryItem> metadata =
         new HashMap<String,MetadataRepositoryItem>();
 }
