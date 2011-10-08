@@ -28,35 +28,35 @@ import hudson.maven.reporters.MavenArtifact;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Represent a {@code maven-metadata.xml} file.
+ * Represents a {@code maven-metadata.xml} file.
  */
 public class MetadataRepositoryItem extends TextRepositoryItem {
 
-    private long lastModified = 0L;
-    private String groupId;
-    private String artifactId;
-    private Set<String> versions = new HashSet<String>();
-
     private MavenBuild build;
+    private String groupId, artifactId, version;
+    private Map<String,ArtifactRepositoryItem> items = new HashMap<String,ArtifactRepositoryItem>();
 
-    public MetadataRepositoryItem(MavenBuild build)
-    {
-        this.build    = build;
+    public static String formatDateVersion(Date date, int buildNo) {
+        return _vfmt.format(date) + "-" + buildNo;
+    }
+
+    public MetadataRepositoryItem(MavenBuild build, MavenArtifact artifact) {
+        this.build      = build;
+        this.groupId    = artifact.groupId;
+        this.artifactId = artifact.artifactId;
+        this.version    = artifact.version;
+    }
+
+    public String getPath() {
+        return groupId.replace('.','/') + "/" + artifactId + "/" + version + "/" + getName();
     }
 
     public void addArtifact(MavenArtifact artifact, ArtifactRepositoryItem item) {
-        this.groupId = artifact.groupId;
-        this.artifactId = artifact.artifactId;
-        try {
-            this.lastModified = Math.max(lastModified, item.getLastModified().getTime());
-            this.versions.add(artifact.version);
-        } catch (IllegalStateException ise) {
-            // the artifact in question does not exist (it was probably pruned); ignore it
-        }
+        this.items.put(artifact.type, item);
     }
 
     public String getName() {
@@ -64,6 +64,10 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
     }
 
     public Date getLastModified() {
+        long lastModified = 0L;
+        for (ArtifactRepositoryItem item : items.values()) {
+            lastModified = Math.max(lastModified, item.getLastModified().getTime());
+        }
         return new Date(lastModified);
     }
 
@@ -75,23 +79,28 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
     protected String generateContent() {
         StringBuilder buf = new StringBuilder();
         buf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        buf.append("<metadata>\n");
+        buf.append("<metadata modelVersion=\"1.1.0\">\n");
         buf.append("  <groupId>" + groupId + "</groupId>\n");
         buf.append("  <artifactId>" + artifactId + "</artifactId>\n");
-        if (versions.size() == 1) {
-            buf.append("  <version>" + versions.iterator().next() + "</version>\n");
-        }
+        buf.append("  <version>" + version + "</version>\n");
         buf.append("  <versioning>\n");
-        buf.append("    <versions>\n");
-        for (String version : versions) {
-            buf.append("      <version>" + version + "</version>\n");
+        buf.append("    <snapshotVersions>\n");
+        for (Map.Entry<String,ArtifactRepositoryItem> entry : items.entrySet()) {
+            String dateVers = formatDateVersion(entry.getValue().getLastModified(), build.getNumber());
+            String itemVersion = version.replaceAll("SNAPSHOT", dateVers);
+            String lastMod = _ufmt.format(entry.getValue().getLastModified());
+            buf.append("      <snapshotVersion>\n");
+            buf.append("        <extension>").append(entry.getKey()).append("</extension>\n");
+            buf.append("        <value>").append(itemVersion).append("</value>\n");
+            buf.append("        <updated>").append(lastMod).append("</updated>\n");
+            buf.append("      </snapshotVersion>\n");
         }
-        buf.append("    </versions>\n");
-        buf.append("    <lastUpdated>" + _fmt.format(getLastModified()) + "</lastUpdated>\n");
+        buf.append("    </snapshotVersions>\n");
         buf.append("  </versioning>\n");
         buf.append("</metadata>\n");
         return buf.toString();
     }
 
-    protected static SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMddHHmmss");
+    protected static SimpleDateFormat _ufmt = new SimpleDateFormat("yyyyMMddHHmmss");
+    protected static SimpleDateFormat _vfmt = new SimpleDateFormat("yyyyMMdd.HHmmss");
 }

@@ -51,37 +51,34 @@ public class DirectoryPopulatorVisitor extends HudsonVisitor {
         this.allowOverwrite = allowOverwrite;
     }
 
-    public @Override void visitArtifact(MavenBuild build, MavenArtifact mavenArtifact)
+    public @Override void visitArtifact(MavenBuild build, MavenArtifact artifact)
     {
-        ArtifactRepositoryItem repositoryItem = new ArtifactRepositoryItem(build, mavenArtifact);
+        // add a Maven 2 compatible artifact entry
+        ArtifactRepositoryItem repositoryItem = new ArtifactRepositoryItem(build, artifact, false);
+        if (!repositoryItem.fileExists()) {
+            return; // skip this artifact, its file was purged
+        }
         root.insert(repositoryItem, repositoryItem.getArtifactPath(), allowOverwrite);
 
-        // add this artifact to the artifactId directory metadata
-        String dirKey = mavenArtifact.groupId + ":" + mavenArtifact.artifactId;
-        MetadataRepositoryItem dirItem = metadata.get(dirKey);
-        if (dirItem == null) {
-            metadata.put(dirKey, dirItem = new MetadataRepositoryItem(build));
-            String path = mavenArtifact.groupId.replace('.','/') + "/" +
-                mavenArtifact.artifactId + "/maven-metadata.xml";
-            addMetadataItem(dirItem, path);
+        // if this is a snapshot, also add a Maven 3 compatible artifact entry
+        if (artifact.version.endsWith("-SNAPSHOT")) {
+            ArtifactRepositoryItem item = new ArtifactRepositoryItem(build, artifact, true);
+            root.insert(item, item.getArtifactPath(), allowOverwrite);
+
+            // add metadata for this artifact version
+            String key = artifact.groupId + ":" + artifact.artifactId + ":" + artifact.version;
+            MetadataRepositoryItem meta = metadata.get(key);
+            if (meta == null) {
+                metadata.put(key, meta = new MetadataRepositoryItem(build, artifact));
+                root.insert(meta, meta.getPath(), allowOverwrite);
+                // add checksums for the item as well
+                root.insert(new MetadataChecksumRepositoryItem("md5", meta),
+                            meta.getPath() + ".md5", allowOverwrite);
+                root.insert(new MetadataChecksumRepositoryItem("sha1", meta),
+                            meta.getPath() + ".sha1", allowOverwrite);
+            }
+            meta.addArtifact(artifact, item);
         }
-        dirItem.addArtifact(mavenArtifact, repositoryItem);
-
-        // and also add a metadata item for this version of this artifact
-        MetadataRepositoryItem item = new MetadataRepositoryItem(build);
-        item.addArtifact(mavenArtifact, repositoryItem);
-        String path = mavenArtifact.groupId.replace('.','/') + "/" + mavenArtifact.artifactId +
-            "/" + mavenArtifact.version + "/maven-metadata.xml";
-        addMetadataItem(item, path);
-    }
-
-    private void addMetadataItem(MetadataRepositoryItem item, String path) {
-        root.insert(item, path, allowOverwrite);
-        // add checksums for the item as well
-        root.insert(new MetadataChecksumRepositoryItem("md5", item),
-                    path + ".md5", allowOverwrite);
-        root.insert(new MetadataChecksumRepositoryItem("sha1", item),
-                    path + ".sha1", allowOverwrite);
     }
 
     private Map<String,MetadataRepositoryItem> metadata =
