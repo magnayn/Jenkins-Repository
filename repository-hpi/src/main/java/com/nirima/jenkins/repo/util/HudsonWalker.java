@@ -105,7 +105,7 @@ public class HudsonWalker {
             AbstractProject item = (AbstractProject)Hudson.getInstance().getItem(project);
             Run r = (Run)item.getBuilds().get(build);
 
-            traverseChain(visitor, run);
+            traverseChain(visitor, r);
         }
     }
 
