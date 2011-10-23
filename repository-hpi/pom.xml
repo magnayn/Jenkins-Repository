@@ -22,8 +22,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.groovy.maven</groupId>
+                <groupId>org.codehaus.gmaven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
+                <version>1.3</version>
                 <executions>
 
                     <execution>
@@ -91,7 +92,7 @@
         <dependency>
             <groupId>com.nirima.jenkins.repository</groupId>
             <artifactId>jenkins-maven-plugin</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
 
