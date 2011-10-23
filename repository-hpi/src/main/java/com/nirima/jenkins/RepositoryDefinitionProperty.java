@@ -82,10 +82,12 @@ public class RepositoryDefinitionProperty extends BuildWrapper implements Serial
                 try {
                     URL url = upstream.getUrl(build);
                     env.put("Jenkins.Repository", url.toExternalForm());
+                    listener.getLogger().println("Setting environment Jenkins.Repository = " + url.toExternalForm());
                 } catch (SelectionType.RepositoryDoesNotExistException x) {
-                    listener.getLogger().print("You asked for an upstream repository, but it does not exist");
+                    listener.getLogger().println("You asked for an upstream repository, but it does not exist");
                     throw new RuntimeException(x);
                 } catch (MalformedURLException e) {
+                    listener.getLogger().println("Problem setting upstream repository URL");
                     throw new RuntimeException(e);
                 }
 

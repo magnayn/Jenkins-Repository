@@ -41,17 +41,23 @@ import java.util.Date;
 public class ArtifactRepositoryItem implements RepositoryContent {
 
     private MavenArtifact artifact;
-    private RepositoryDirectory directory;
     private MavenBuild build;
+    private boolean timestampedSnapshot;
+    private RepositoryDirectory directory;
 
-    public ArtifactRepositoryItem(MavenBuild build, MavenArtifact mavenArtifact)
-    {
+    public ArtifactRepositoryItem(MavenBuild build, MavenArtifact mavenArtifact, boolean timestampedSnapshot) {
         this.artifact = mavenArtifact;
-        this.build    = build;
+        this.build = build;
+        this.timestampedSnapshot = timestampedSnapshot;
     }
 
     public String getName() {
-        return artifact.canonicalName;
+        if (timestampedSnapshot && artifact.version.endsWith("-SNAPSHOT")) {
+            String vers = MetadataRepositoryItem.formatDateVersion(getLastModified(), build.getNumber());
+            return artifact.canonicalName.replaceAll("SNAPSHOT", vers);
+        } else {
+            return artifact.canonicalName;
+        }
     }
 
     public RepositoryDirectory getParent() {
@@ -83,8 +89,16 @@ public class ArtifactRepositoryItem implements RepositoryContent {
         return "From Build #" + build.getNumber() + " of " + build.getParentBuild().getParent().getName();
     }
 
-    public File getFile()
-    {
+    public boolean fileExists() {
+        try {
+            getFile();
+            return true;
+        } catch (IllegalStateException ise) {
+            return false;
+        }
+    }
+
+    public File getFile() {
         File fPath = new File(new File(new File(build.getArtifactsDir(), artifact.groupId), artifact.artifactId), artifact.version);
         File fArtifact;
 
@@ -104,13 +118,11 @@ public class ArtifactRepositoryItem implements RepositoryContent {
      * The path that the artifact believes it belongs to.
      * @return
      */
-    public String getArtifactPath()
-    {
-        return artifact.groupId.replace('.','/') + "/" + artifact.artifactId + '/' + artifact.version + "/" + artifact.canonicalName;
+    public String getArtifactPath() {
+        return artifact.groupId.replace('.','/') + "/" + artifact.artifactId + '/' + artifact.version + "/" + getName();
     }
 
-    public String getContentType()
-    {
+    public String getContentType() {
         return null;
     }
 }

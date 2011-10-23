@@ -23,9 +23,10 @@
  */
 package com.nirima.jenkins.repo.util;
 
-import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.build.ArtifactRepositoryItem;
 import com.nirima.jenkins.repo.build.DirectoryRepositoryItem;
+import com.nirima.jenkins.repo.build.MetadataChecksumRepositoryItem;
+import com.nirima.jenkins.repo.build.MetadataRepositoryItem;
 import hudson.maven.MavenBuild;
 import hudson.maven.MavenModule;
 import hudson.maven.MavenModuleSetBuild;
@@ -33,7 +34,7 @@ import hudson.maven.reporters.MavenArtifact;
 import hudson.maven.reporters.MavenArtifactRecord;
 import hudson.model.Run;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -50,9 +51,36 @@ public class DirectoryPopulatorVisitor extends HudsonVisitor {
         this.allowOverwrite = allowOverwrite;
     }
 
-    public @Override void visitArtifact(MavenBuild build, MavenArtifact mavenArtifact)
+    public @Override void visitArtifact(MavenBuild build, MavenArtifact artifact)
     {
-        ArtifactRepositoryItem repositoryItem = new ArtifactRepositoryItem(build, mavenArtifact);
+        // add a Maven 2 compatible artifact entry
+        ArtifactRepositoryItem repositoryItem = new ArtifactRepositoryItem(build, artifact, false);
+        if (!repositoryItem.fileExists()) {
+            return; // skip this artifact, its file was purged
+        }
         root.insert(repositoryItem, repositoryItem.getArtifactPath(), allowOverwrite);
+
+        // if this is a snapshot, also add a Maven 3 compatible artifact entry
+        if (artifact.version.endsWith("-SNAPSHOT")) {
+            ArtifactRepositoryItem item = new ArtifactRepositoryItem(build, artifact, true);
+            root.insert(item, item.getArtifactPath(), allowOverwrite);
+
+            // add metadata for this artifact version
+            String key = artifact.groupId + ":" + artifact.artifactId + ":" + artifact.version;
+            MetadataRepositoryItem meta = metadata.get(key);
+            if (meta == null) {
+                metadata.put(key, meta = new MetadataRepositoryItem(build, artifact));
+                root.insert(meta, meta.getPath(), allowOverwrite);
+                // add checksums for the item as well
+                root.insert(new MetadataChecksumRepositoryItem("md5", meta),
+                            meta.getPath() + ".md5", allowOverwrite);
+                root.insert(new MetadataChecksumRepositoryItem("sha1", meta),
+                            meta.getPath() + ".sha1", allowOverwrite);
+            }
+            meta.addArtifact(artifact, item);
+        }
     }
+
+    private Map<String,MetadataRepositoryItem> metadata =
+        new HashMap<String,MetadataRepositoryItem>();
 }

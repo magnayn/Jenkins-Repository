@@ -14,7 +14,7 @@
             &lt;repositories&gt;
                 &lt;repository&gt;
                     &lt;id&gt;jenkins&lt;/id&gt;
-                    &lt;url&gt;${Jenkins.Repository}&lt;/url&gt;
+                    &lt;url&gt;${env.Jenkins.Repository}&lt;/url&gt;
                     &lt;releases&gt;
                         &lt;enabled&gt;true&lt;/enabled&gt;
                     &lt;/releases&gt;
@@ -26,7 +26,7 @@
             &lt;pluginRepositories&gt;
                 &lt;pluginRepository&gt;
                     &lt;id&gt;jenkins&lt;/id&gt;
-                    &lt;url&gt;${Jenkins.Repository}&lt;/url&gt;
+                    &lt;url&gt;${env.Jenkins.Repository}&lt;/url&gt;
                     &lt;releases&gt;
                         &lt;enabled&gt;true&lt;/enabled&gt;
                     &lt;/releases&gt;
