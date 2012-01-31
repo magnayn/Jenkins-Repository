@@ -40,8 +40,12 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
     private String groupId, artifactId, version;
     private Map<String,ArtifactRepositoryItem> items = new HashMap<String,ArtifactRepositoryItem>();
 
-    public static String formatDateVersion(Date date, int buildNo) {
-        return _vfmt.format(date) + "-" + buildNo;
+    public static String formatDateVersion(Date date) {
+        // we used to tack the build number on here, but that causes problems because the build
+        // number seems to be always for the latest build, not the build that generated this
+        // artifact; so we just use -1; it is essentially impossible that a project will be built
+        // twice in the same millsecond, so there's no risk of collision
+        return _vfmt.format(date) + "-1";
     }
 
     public MetadataRepositoryItem(MavenBuild build, MavenArtifact artifact) {
@@ -86,7 +90,7 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
         buf.append("  <versioning>\n");
         buf.append("    <snapshotVersions>\n");
         for (Map.Entry<String,ArtifactRepositoryItem> entry : items.entrySet()) {
-            String dateVers = formatDateVersion(entry.getValue().getLastModified(), build.getNumber());
+            String dateVers = formatDateVersion(entry.getValue().getLastModified());
             String itemVersion = version.replaceAll("SNAPSHOT", dateVers);
             String lastMod = _ufmt.format(entry.getValue().getLastModified());
             buf.append("      <snapshotVersion>\n");

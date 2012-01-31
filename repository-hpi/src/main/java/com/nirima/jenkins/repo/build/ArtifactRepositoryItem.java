@@ -53,7 +53,7 @@ public class ArtifactRepositoryItem implements RepositoryContent {
 
     public String getName() {
         if (timestampedSnapshot && artifact.version.endsWith("-SNAPSHOT")) {
-            String vers = MetadataRepositoryItem.formatDateVersion(getLastModified(), build.getNumber());
+            String vers = MetadataRepositoryItem.formatDateVersion(getLastModified());
             return artifact.canonicalName.replaceAll("SNAPSHOT", vers);
         } else {
             return artifact.canonicalName;
