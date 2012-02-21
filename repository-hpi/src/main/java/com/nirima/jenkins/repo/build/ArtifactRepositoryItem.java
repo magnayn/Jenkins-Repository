@@ -123,6 +123,11 @@ public class ArtifactRepositoryItem implements RepositoryContent {
     }
 
     public String getContentType() {
-        return null;
+        if( artifact.isPOM() )
+            return "application/xml";
+        if( artifact.type.equalsIgnoreCase("jar") )
+            return "application/java-archive";
+
+        return null; // We don't know..
     }
 }

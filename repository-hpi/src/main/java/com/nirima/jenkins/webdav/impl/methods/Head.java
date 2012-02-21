@@ -78,6 +78,7 @@ public class Head extends MethodBase {
                    return;
                 }
 
+                this.getResponse().setHeader("Content-Type", "text/html");
                 generateDirectoryListing(ctxt, (IDavCollection) item);
 
                 return;

@@ -46,7 +46,14 @@ public class BridgeRepositoryContent extends BridgeRepositoryElement<RepositoryC
     public String getContentType() {
         String type =  element.getContentType();
         if( type == null )
-            return repo.getMimeTypeResolver().getMimeType(getName());
+        {
+            type = repo.getMimeTypeResolver().getMimeType(getName());
+        }
+        // Last resort..
+        if( type == null )
+        {
+            type = "text/plain";
+        }
         return type;
     }
 

@@ -45,7 +45,6 @@ public class ServletContextMimeTypeResolver implements IMimeTypeResolver
     public String getMimeType(String filename)
     {
         String contentType = servletContext.getMimeType(filename);
-        if (contentType == null) contentType = "text/plain";
 
         return contentType;
     }

@@ -79,6 +79,10 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
         return "From Build #" + build.getNumber() + " of " + build.getParentBuild().getParent().getName();
     }
 
+    public String getContentType() {
+        return "application/xml";
+    }
+
     @Override
     protected String generateContent() {
         StringBuilder buf = new StringBuilder();
