@@ -38,7 +38,7 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
 
     private MavenBuild build;
     private String groupId, artifactId, version;
-    private Map<String,ArtifactRepositoryItem> items = new HashMap<String,ArtifactRepositoryItem>();
+    private Map<MavenArtifact,ArtifactRepositoryItem> items = new HashMap<MavenArtifact,ArtifactRepositoryItem>();
 
     public static String formatDateVersion(Date date) {
         // we used to tack the build number on here, but that causes problems because the build
@@ -60,7 +60,7 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
     }
 
     public void addArtifact(MavenArtifact artifact, ArtifactRepositoryItem item) {
-        this.items.put(artifact.type, item);
+        this.items.put(artifact, item);
     }
 
     public String getName() {
@@ -89,12 +89,22 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
         buf.append("  <version>" + version + "</version>\n");
         buf.append("  <versioning>\n");
         buf.append("    <snapshotVersions>\n");
-        for (Map.Entry<String,ArtifactRepositoryItem> entry : items.entrySet()) {
+        for (Map.Entry<MavenArtifact,ArtifactRepositoryItem> entry : items.entrySet()) {
+
+            MavenArtifact theArtifact = entry.getKey();
+
             String dateVers = formatDateVersion(entry.getValue().getLastModified());
             String itemVersion = version.replaceAll("SNAPSHOT", dateVers);
             String lastMod = _ufmt.format(entry.getValue().getLastModified());
             buf.append("      <snapshotVersion>\n");
-            buf.append("        <extension>").append(entry.getKey()).append("</extension>\n");
+
+            // Optional classifier.
+            if( theArtifact.classifier != null && theArtifact.classifier.length() > 0 )
+            {
+                buf.append("        <classifier>").append(theArtifact.classifier).append("</classifier>\n");
+            }
+
+            buf.append("        <extension>").append(theArtifact.type).append("</extension>\n");
             buf.append("        <value>").append(itemVersion).append("</value>\n");
             buf.append("        <updated>").append(lastMod).append("</updated>\n");
             buf.append("      </snapshotVersion>\n");
