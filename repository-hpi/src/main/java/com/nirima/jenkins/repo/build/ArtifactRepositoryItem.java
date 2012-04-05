@@ -53,7 +53,7 @@ public class ArtifactRepositoryItem implements RepositoryContent {
 
     public String getName() {
         if (timestampedSnapshot && artifact.version.endsWith("-SNAPSHOT")) {
-            String vers = MetadataRepositoryItem.formatDateVersion(getLastModified());
+            String vers = MetadataRepositoryItem.formatDateVersion(build);
             return artifact.canonicalName.replaceAll("SNAPSHOT", vers);
         } else {
             return artifact.canonicalName;
@@ -129,5 +129,9 @@ public class ArtifactRepositoryItem implements RepositoryContent {
             return "application/java-archive";
 
         return null; // We don't know..
+    }
+
+    public MavenBuild getBuild() {
+        return build;
     }
 }

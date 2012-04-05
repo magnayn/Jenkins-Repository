@@ -25,11 +25,10 @@ package com.nirima.jenkins.repo.build;
 
 import hudson.maven.MavenBuild;
 import hudson.maven.reporters.MavenArtifact;
+import hudson.model.Run;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents a {@code maven-metadata.xml} file.
@@ -40,12 +39,17 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
     private String groupId, artifactId, version;
     private Map<MavenArtifact,ArtifactRepositoryItem> items = new HashMap<MavenArtifact,ArtifactRepositoryItem>();
 
-    public static String formatDateVersion(Date date) {
+    private static String formatDateVersion(Date date, int buildNo) {
         // we used to tack the build number on here, but that causes problems because the build
         // number seems to be always for the latest build, not the build that generated this
         // artifact; so we just use -1; it is essentially impossible that a project will be built
         // twice in the same millsecond, so there's no risk of collision
-        return _vfmt.format(date) + "-1";
+        return _vfmt.format(date) + "-" + buildNo;
+    }
+
+    public static String formatDateVersion(Run buildRun) {
+        // Create a date/time stamp from a particular run.
+        return formatDateVersion(buildRun.getTime(), buildRun.getNumber());
     }
 
     public MetadataRepositoryItem(MavenBuild build, MavenArtifact artifact) {
@@ -93,13 +97,58 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
         buf.append("  <version>" + version + "</version>\n");
         buf.append("  <versioning>\n");
         buf.append("    <snapshotVersions>\n");
+
+        // It is possible that "items" contains many entries for the same artifact; we
+        // just want the latest.
+
+        Map<String,Entry> entryToBuild = new HashMap<String,Entry>();
+
         for (Map.Entry<MavenArtifact,ArtifactRepositoryItem> entry : items.entrySet()) {
 
-            MavenArtifact theArtifact = entry.getKey();
+            Entry e = new Entry(entry);
+            String id = e.toString();
 
-            String dateVers = formatDateVersion(entry.getValue().getLastModified());
+            if( entryToBuild.containsKey(id))
+            {
+                Entry current = entryToBuild.get(id);
+                if( e.isNewerThan(current) )
+                    entryToBuild.put(id, e);
+            }
+            else
+            {
+                entryToBuild.put(id, e);
+            }
+        }
+
+        for(Entry e : entryToBuild.values())
+        {
+            e.getSnapshotXml(buf);
+        }
+
+        buf.append("    </snapshotVersions>\n");
+        buf.append("  </versioning>\n");
+        buf.append("</metadata>\n");
+        return buf.toString();
+    }
+
+    class Entry {
+        MavenArtifact          theArtifact;
+        ArtifactRepositoryItem theItem;
+
+        public Entry(Map.Entry<MavenArtifact, ArtifactRepositoryItem> entry)
+        {
+            theArtifact = entry.getKey();
+
+            theItem = entry.getValue();
+        }
+
+        public void getSnapshotXml( StringBuilder buf )
+        {
+            //String dateVers = formatDateVersion(entry.getValue().getLastModified());
+            String dateVers = formatDateVersion(theItem.getBuild());
+
             String itemVersion = version.replaceAll("SNAPSHOT", dateVers);
-            String lastMod = _ufmt.format(entry.getValue().getLastModified());
+            String lastMod = _ufmt.format(theItem.getLastModified());
             buf.append("      <snapshotVersion>\n");
 
             // Optional classifier.
@@ -113,10 +162,15 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
             buf.append("        <updated>").append(lastMod).append("</updated>\n");
             buf.append("      </snapshotVersion>\n");
         }
-        buf.append("    </snapshotVersions>\n");
-        buf.append("  </versioning>\n");
-        buf.append("</metadata>\n");
-        return buf.toString();
+
+        public String toString() {
+            return theArtifact.type + ":" + theArtifact.classifier;
+        }
+
+
+        public boolean isNewerThan(Entry otherEntry) {
+            return theItem.getLastModified().after(otherEntry.theItem.getLastModified());
+        }
     }
 
     protected static SimpleDateFormat _ufmt = new SimpleDateFormat("yyyyMMddHHmmss");

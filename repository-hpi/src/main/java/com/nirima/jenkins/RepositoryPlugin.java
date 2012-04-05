@@ -31,6 +31,7 @@ import com.nirima.jenkins.webdav.interfaces.IDavRepo;
 import com.nirima.jenkins.webdav.interfaces.IMethod;
 import com.nirima.jenkins.webdav.interfaces.IMethodFactory;
 import hudson.Extension;
+import hudson.Functions;
 import hudson.Plugin;
 import hudson.model.*;
 import hudson.util.IOUtils;
@@ -55,7 +56,7 @@ import hudson.plugins.git.util.BuildData;
 @Extension
 public class RepositoryPlugin extends Plugin implements RootAction, Serializable {
     public String getIconFileName() {
-        return "/plugin/repository/static/icons/repository-32x32.png";
+        return Functions.getResourcePath()+"/plugin/repository/static/icons/repository-32x32.png";
     }
 
     public String getDisplayName() {

@@ -23,8 +23,10 @@
  */
 package com.nirima.jenkins.repo.build;
 
+import com.nirima.jenkins.repo.RepositoryContent;
 import hudson.maven.MavenBuild;
 import hudson.maven.reporters.MavenArtifact;
+import org.apache.commons.io.IOUtils;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -37,15 +39,15 @@ import java.util.Date;
 public class MetadataChecksumRepositoryItem extends TextRepositoryItem {
 
     private String algorithm;
-    private MetadataRepositoryItem item;
+    private RepositoryContent item;
 
-    public MetadataChecksumRepositoryItem(String algorithm, MetadataRepositoryItem item) {
+    public MetadataChecksumRepositoryItem(String algorithm, RepositoryContent item) {
         this.algorithm = algorithm;
         this.item = item;
     }
 
     public String getName() {
-        return "maven-metadata.xml." + algorithm.toLowerCase();
+        return item.getName() + "." + algorithm.toLowerCase();
     }
 
     public Date getLastModified() {
@@ -59,11 +61,11 @@ public class MetadataChecksumRepositoryItem extends TextRepositoryItem {
     protected String generateContent() {
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm.toUpperCase());
-            byte[] digest = md.digest(item.generateContent().getBytes());
+            byte[] digest = md.digest(IOUtils.toByteArray(item.getContent()));
             String hex = new BigInteger(1, digest).toString(16);
             return (hex.length() % 2 == 0) ? hex : ("0" + hex);
-        } catch (NoSuchAlgorithmException nsae) {
-            return "";
+        } catch (Exception nsae) {
+            return "ERROR: " + nsae.getMessage();
         }
     }
 }
