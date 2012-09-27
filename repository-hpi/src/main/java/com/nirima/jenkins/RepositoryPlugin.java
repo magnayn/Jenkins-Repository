@@ -24,7 +24,6 @@
 package com.nirima.jenkins;
 
 import com.nirima.jenkins.bridge.BridgeRepository;
-import com.nirima.jenkins.repo.RootElement;
 import com.nirima.jenkins.webdav.impl.MethodFactory;
 import com.nirima.jenkins.webdav.impl.ServletContextMimeTypeResolver;
 import com.nirima.jenkins.webdav.interfaces.IDavRepo;
@@ -36,9 +35,9 @@ import hudson.Plugin;
 import hudson.model.*;
 import hudson.util.IOUtils;
 import com.nirima.jenkins.repo.RepositoryContent;
-import com.nirima.jenkins.repo.project.ProjectsElement;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -102,9 +101,14 @@ public class RepositoryPlugin extends Plugin implements RootAction, Serializable
             return;
         }
 
+        serveRequest(new BridgeRepository(null), "/plugin/repository");
+    }
+
+    public void serveRequest(IDavRepo repo, String root) {
+        StaplerRequest req = Stapler.getCurrentRequest();
+        StaplerResponse rsp = Stapler.getCurrentResponse();
         try
         {
-            IDavRepo repo = new BridgeRepository(null);
             if (repo.getMimeTypeResolver() == null)
             {
                 ServletContextMimeTypeResolver ctx = new ServletContextMimeTypeResolver();
@@ -112,7 +116,7 @@ public class RepositoryPlugin extends Plugin implements RootAction, Serializable
                 repo.setMimeTypeResolver(ctx);
             }
             IMethod method = methodFactory.createMethod(req, rsp);
-            method.init(req, rsp, null, repo, "/plugin/repository");
+            method.init(req, rsp, null, repo, root);
             method.invoke();
         }
         catch (Exception e)
@@ -122,8 +126,6 @@ public class RepositoryPlugin extends Plugin implements RootAction, Serializable
             //s_logger.error(e.toString());
             throw new RuntimeException(e);
         }
-
-
     }
 
     private void displayElement(StaplerRequest req, StaplerResponse rsp, RepositoryElement currentItem) throws Exception {
