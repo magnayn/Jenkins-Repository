@@ -38,10 +38,16 @@ public class BridgeRepository implements IDavRepo {
     private static final Logger log = Logger.getLogger(BridgeRepository.class);
 
     IMimeTypeResolver mimeTypeResolver;
-    RootElement rootElement = new RootElement();
+    RepositoryDirectory rootElement;
 
     public BridgeRepository(IMimeTypeResolver mimeTypeResolver)
     {
+        this(new RootElement(),mimeTypeResolver);
+    }
+
+    public BridgeRepository(RepositoryDirectory root, IMimeTypeResolver mimeTypeResolver)
+    {
+        this.rootElement = root;
         this.mimeTypeResolver = mimeTypeResolver;
     }
 
