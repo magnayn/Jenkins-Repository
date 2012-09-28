@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.nirima.jenkins.repository</groupId>
         <artifactId>pom</artifactId>
-        <version>0.11-SNAPSHOT</version>
+        <version>0.11</version>
     </parent>
 
     <groupId>jenkins</groupId>
@@ -12,7 +12,7 @@
     <description>This plug-in exposes project builds as a maven repository so the artifacts can be picked up by
         downstream builds or other systems.
     </description>
-    <version>0.11-SNAPSHOT</version>
+    <version>0.11</version>
     <packaging>hpi</packaging>
 
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Jenkins+Maven+Repository+Server</url>
