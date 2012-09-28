@@ -63,7 +63,15 @@ public class MetadataChecksumRepositoryItem extends TextRepositoryItem {
             MessageDigest md = MessageDigest.getInstance(algorithm.toUpperCase());
             byte[] digest = md.digest(IOUtils.toByteArray(item.getContent()));
             String hex = new BigInteger(1, digest).toString(16);
-            return (hex.length() % 2 == 0) ? hex : ("0" + hex);
+
+            // Need to prepend with 0s if not the correct length
+            int requiredNumberOfCharacters = md.getDigestLength() * 2;
+            while( hex.length() < requiredNumberOfCharacters)
+            {
+                hex = "0" + hex;
+            }
+
+            return hex;
         } catch (Exception nsae) {
             return "ERROR: " + nsae.getMessage();
         }
