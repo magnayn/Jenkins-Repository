@@ -71,9 +71,9 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.jvnet.hudson.plugins</groupId>
+            <groupId>org.jenkinsci.plugins</groupId>
             <artifactId>git</artifactId>
-            <version>1.1.5</version>
+            <version>1.1.23</version>
         </dependency>
 
         <dependency>
@@ -83,15 +83,15 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.collections</groupId>
-            <artifactId>google-collections</artifactId>
-            <version>1.0</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>13.0.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>token-macro</artifactId>
-            <version>1.2</version>
+            <version>1.5.1</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -116,5 +116,12 @@
 
     </dependencies>
 
+ <repositories>
+     <repository>
+       <id>jgit-repository</id>
+       <name>Eclipse JGit Repository</name>
+       <url>http://download.eclipse.org/jgit/maven</url>
+     </repository>
+   </repositories>
 
 </project>
