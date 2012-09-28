@@ -36,10 +36,10 @@
                         <configuration>
 
                             <source>
-                                String target =
-                                "${basedir}/target/classes/tools/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}";
-                                String src =
-                                "${settings.localRepository}/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}";
+                                File target = new File(
+                                "${basedir}/target/classes/tools/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}");
+                                File src = new File(
+                                "${settings.localRepository}/com/nirima/jenkins/repository/jenkins-maven-plugin/${project.version}");
 
                                 def a = new AntBuilder();
                                 a.mkdir(dir:target);
