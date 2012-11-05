@@ -25,6 +25,7 @@
 package com.nirima.jenkins.repo.project;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import hudson.model.BuildableItemWithBuildWrappers;
@@ -63,8 +64,6 @@ public class ProjectBuildList extends AbstractRepositoryDirectory implements Rep
 
 
         if (type == Type.Build) {
-            Collection<RepositoryElement> children = new ArrayList<RepositoryElement>();
-
             Function<Run, ProjectBuildRepositoryRoot> fn;
 
             fn = new Function<Run, ProjectBuildRepositoryRoot>() {
@@ -80,9 +79,11 @@ public class ProjectBuildList extends AbstractRepositoryDirectory implements Rep
             Iterable<ProjectBuildRepositoryRoot> i = Iterables.transform(item.asProject().getBuilds(), fn);
 
             // Remove NULL entries
-            Iterables.removeAll(i, Lists.newArrayList((ProjectBuildRepositoryRoot) null));
-
-            return Lists.newArrayList(i);
+            return Lists.newArrayList(Iterables.filter(i, new Predicate<ProjectBuildRepositoryRoot>() {
+                public boolean apply(ProjectBuildRepositoryRoot projectBuildRepositoryRoot) {
+                    return projectBuildRepositoryRoot != null;
+                }
+            }));
 
         } else {
 
