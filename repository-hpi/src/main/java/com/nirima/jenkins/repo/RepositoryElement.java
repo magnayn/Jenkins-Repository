@@ -29,6 +29,8 @@ public interface RepositoryElement {
 
     String getName();
 
+    String getDescription();
+
     RepositoryDirectory getParent();
 
     void setParent(RepositoryDirectory parent);

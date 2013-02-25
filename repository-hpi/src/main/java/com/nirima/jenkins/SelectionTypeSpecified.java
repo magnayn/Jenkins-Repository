@@ -1,5 +1,7 @@
 package com.nirima.jenkins;
 
+import com.nirima.jenkins.action.PathInRepositoryAction;
+import com.nirima.jenkins.action.RepositoryAction;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.Descriptor;
@@ -27,15 +29,8 @@ public class SelectionTypeSpecified extends SelectionType  {
     }
 
     @Override
-    public URL getUrl(AbstractBuild build) throws MalformedURLException, RepositoryDoesNotExistException {
-         URL url = new URL(Jenkins.getInstance().getRootUrl());
-
-        url = new URL(url, "plugin/repository/project/");
-
-
-        url = new URL(url, path);
-
-        return url;
+    public RepositoryAction getAction(AbstractBuild build) throws MalformedURLException, RepositoryDoesNotExistException {
+        return new PathInRepositoryAction(path);
     }
 
     @Extension

@@ -23,6 +23,8 @@
  */
 package com.nirima.jenkins;
 
+import com.nirima.jenkins.action.ProjectRepositoryAction;
+import com.nirima.jenkins.action.RepositoryAction;
 import hudson.Extension;
 import hudson.model.*;
 import jenkins.model.Jenkins;
@@ -49,16 +51,12 @@ public class SelectionTypeUpstream extends SelectionType {
     }
 
     @Override
-    public URL getUrl(AbstractBuild b) throws MalformedURLException, RepositoryDoesNotExistException {
-        URL url = new URL(Jenkins.getInstance().getRootUrl());
-
-        url = new URL(url, "plugin/repository/project/");
-
+    public RepositoryAction getAction(AbstractBuild b) throws MalformedURLException, RepositoryDoesNotExistException {
 
         // What is the upstream project name?
         Cause.UpstreamCause theCause = (Cause.UpstreamCause) b.getCause(Cause.UpstreamCause.class);
         String theProject;
-        String theBuild;
+        int    theBuild;
         if (theCause == null) {
             ParametersAction action = b.getAction(ParametersAction.class);
             if (action == null) {
@@ -67,16 +65,15 @@ public class SelectionTypeUpstream extends SelectionType {
             RunParameterValue value = (RunParameterValue) action.getParameter("Upstream");
 
             theProject = value.getJobName();
-            theBuild = value.getNumber();
+            theBuild =   Integer.parseInt(value.getNumber());
         } else {
             theProject = theCause.getUpstreamProject();
-            theBuild = "" + theCause.getUpstreamBuild();
+            theBuild = theCause.getUpstreamBuild();
         }
-        url = new URL(url, theProject + "/");
 
-        url = addBuildId(url, this.build);
+        return new ProjectRepositoryAction(theProject, theBuild, this.build);
 
-        return url;
+
     }
 
     @Extension
@@ -84,7 +81,7 @@ public class SelectionTypeUpstream extends SelectionType {
 
         @Override
         public String getDisplayName() {
-            return "Upstream Project that triggered this build";  //To change body of implemented methods use File | Settings | File Templates.
+            return "Upstream Project that triggered this build";
         }
     }
 }

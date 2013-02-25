@@ -36,8 +36,6 @@ public interface RepositoryContent extends RepositoryElement {
 
     public Long getSize();
 
-    public String getDescription();
-
     /**
      * @return MIME type for the content.
      */

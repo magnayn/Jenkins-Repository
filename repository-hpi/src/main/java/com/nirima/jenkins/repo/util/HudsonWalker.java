@@ -23,7 +23,12 @@
  */
 package com.nirima.jenkins.repo.util;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.nirima.jenkins.action.ProjectRepositoryAction;
+import com.nirima.jenkins.action.RepositoryAction;
 import com.nirima.jenkins.repo.RepositoryElement;
 import com.nirima.jenkins.repo.build.ArtifactRepositoryItem;
 import hudson.maven.MavenBuild;
@@ -96,17 +101,27 @@ public class HudsonWalker {
             return;
 
         traverse(visitor, run);
-        Cause.UpstreamCause upstream = (Cause.UpstreamCause)run.getCause(Cause.UpstreamCause.class);
-        if( upstream != null )
-        {
-            String project = upstream.getUpstreamProject();
-            int build = upstream.getUpstreamBuild();
 
-            AbstractProject item = (AbstractProject)Hudson.getInstance().getItem(project);
-            Run r = (Run)item.getBuilds().get(build);
+        RepositoryAction repositoryAction = run.getAction(RepositoryAction.class);
 
-            traverseChain(visitor, r);
+        if( repositoryAction != null ) {
+            if( repositoryAction instanceof ProjectRepositoryAction ) {
+                final ProjectRepositoryAction projectRepositoryAction = (ProjectRepositoryAction) repositoryAction;
+
+                AbstractProject item = (AbstractProject)Hudson.getInstance().getItem(projectRepositoryAction.getProjectName());
+
+
+                Optional<Run> r = Iterables.tryFind(item.getBuilds(), new Predicate<Run>() {
+                    public boolean apply(Run run) {
+                        return run.getNumber() == projectRepositoryAction.getBuildNumber();
+                    }
+                });
+
+                if( r.isPresent() )
+                    traverseChain(visitor, r.get());
+            }
         }
+
     }
 
     /**

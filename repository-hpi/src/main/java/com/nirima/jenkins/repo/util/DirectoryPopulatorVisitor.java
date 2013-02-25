@@ -23,6 +23,7 @@
  */
 package com.nirima.jenkins.repo.util;
 
+import com.google.common.base.Joiner;
 import com.nirima.jenkins.repo.RepositoryContent;
 import com.nirima.jenkins.repo.build.ArtifactRepositoryItem;
 import com.nirima.jenkins.repo.build.DirectoryRepositoryItem;
@@ -35,7 +36,9 @@ import hudson.maven.reporters.MavenArtifact;
 import hudson.maven.reporters.MavenArtifactRecord;
 import hudson.model.Run;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,10 +49,28 @@ public class DirectoryPopulatorVisitor extends HudsonVisitor {
     DirectoryRepositoryItem root;
     public boolean allowOverwrite;
 
+    protected List<String> listOfProjectNames = new ArrayList<String>();
+
     public DirectoryPopulatorVisitor(DirectoryRepositoryItem root, boolean allowOverwrite)
     {
         this.root = root;
         this.allowOverwrite = allowOverwrite;
+    }
+
+    public void visitBuild(MavenBuild build)
+    {
+        listOfProjectNames.add(build.getDisplayName());
+        root.setDescription(getDescription());
+    }
+
+    public void visitModuleSet(MavenModuleSetBuild build)
+    {
+        listOfProjectNames.add(build.getDisplayName());
+        root.setDescription(getDescription());
+    }
+
+    public String getDescription() {
+        return Joiner.on("->").join(listOfProjectNames);
     }
 
     public @Override void visitArtifact(MavenBuild build, MavenArtifact artifact)

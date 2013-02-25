@@ -41,5 +41,11 @@ public abstract class AbstractRepositoryDirectory extends AbstractRepositoryElem
        return null;
     }
 
+    public String getDescription()
+    {
+        // Default to an empty description
+        return "";
+    }
+
     public abstract Collection<? extends RepositoryElement> getChildren();
 }

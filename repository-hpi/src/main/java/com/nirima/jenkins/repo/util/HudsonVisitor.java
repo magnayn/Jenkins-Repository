@@ -38,13 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by IntelliJ IDEA.
- * User: magnayn
- * Date: 02/03/2011
- * Time: 16:15
- * To change this template use File | Settings | File Templates.
- */
+
 public abstract class HudsonVisitor {
 
     public void visitModuleSet(MavenModuleSetBuild build)

@@ -23,15 +23,14 @@
  */
 package com.nirima.jenkins;
 
+import com.nirima.jenkins.action.RepositoryAction;
 import hudson.model.AbstractBuild;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
-import org.apache.commons.httpclient.Cookie;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 
 public abstract class SelectionType implements Describable<SelectionType>, Serializable {
@@ -44,18 +43,5 @@ public abstract class SelectionType implements Describable<SelectionType>, Seria
         return Jenkins.getInstance().getDescriptorOrDie(getClass());
     }
 
-    protected URL addBuildId(URL url, String buildId) throws MalformedURLException {
-
-        if (buildId == null)
-            return url;
-
-        if ("repository".equalsIgnoreCase("repository"))
-            url = new URL(url, "LastSuccessful/repository/");
-        else
-            url = new URL(url, "LastSuccessful/repositoryChain/");
-
-        return url;
-    }
-
-    public abstract URL getUrl(AbstractBuild build) throws MalformedURLException, RepositoryDoesNotExistException;
+    public abstract RepositoryAction getAction(AbstractBuild build) throws MalformedURLException, RepositoryDoesNotExistException;
 }

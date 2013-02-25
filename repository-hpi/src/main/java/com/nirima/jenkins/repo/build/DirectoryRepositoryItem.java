@@ -46,6 +46,8 @@ public class DirectoryRepositoryItem extends AbstractRepositoryElement implement
 
     protected String name;
 
+    protected String description;
+
     public DirectoryRepositoryItem(RepositoryDirectory parent, String name) {
         super(parent);
         this.name = name;
@@ -53,7 +55,19 @@ public class DirectoryRepositoryItem extends AbstractRepositoryElement implement
 
     @Override
     public String getName() {
-        return name;  //To change body of implemented methods use File | Settings | File Templates.
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     protected Map<String, RepositoryElement> getItems()

@@ -78,7 +78,7 @@
 
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
-            <version>1.466</version>
+            <version>${jenkins.version}</version>
             <artifactId>maven-plugin</artifactId>
         </dependency>
 

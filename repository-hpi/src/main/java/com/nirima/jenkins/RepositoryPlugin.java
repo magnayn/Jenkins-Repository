@@ -234,8 +234,9 @@ public class RepositoryPlugin extends Plugin implements RootAction, Serializable
         {
          //   lastModified = ((RepositoryContent)item).getLastModified();
             size =  "" + ((RepositoryContent)item).getSize();
-            description =   ((RepositoryContent)item).getDescription();
         }
+
+        description =   item.getDescription();
 
          String entry = "      <tr>\n" +
                 "            <td>\n" +

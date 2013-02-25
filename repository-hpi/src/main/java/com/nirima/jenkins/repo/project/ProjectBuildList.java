@@ -69,8 +69,6 @@ public class ProjectBuildList extends AbstractRepositoryDirectory implements Rep
             fn = new Function<Run, ProjectBuildRepositoryRoot>() {
 
                 public ProjectBuildRepositoryRoot apply(Run r) {
-                    if( r.getResult() != Result.SUCCESS )
-                        return null;
                     return new ProjectBuildRepositoryRoot(ProjectBuildList.this, r, "" + r.getNumber());
                 }
             };

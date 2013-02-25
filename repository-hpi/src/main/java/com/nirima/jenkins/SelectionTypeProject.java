@@ -23,15 +23,19 @@
  */
 package com.nirima.jenkins;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.nirima.jenkins.action.ProjectRepositoryAction;
+import com.nirima.jenkins.action.RepositoryAction;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildableItemWithBuildWrappers;
 import hudson.model.Descriptor;
+import hudson.model.Job;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 
@@ -63,18 +67,23 @@ public class SelectionTypeProject extends SelectionType {
     }
 
     @Override
-    public URL getUrl(AbstractBuild theBuild) throws MalformedURLException, RepositoryDoesNotExistException {
-        URL url = new URL(Jenkins.getInstance().getRootUrl());
+    public RepositoryAction getAction(AbstractBuild theBuild) throws MalformedURLException, RepositoryDoesNotExistException {
 
-        url = new URL(url, "plugin/repository/project/");
+        int id = getLastSuccessfulBuildNumber(project);
 
-        // Specific
-        url = new URL(url, project + "/");
+        return new ProjectRepositoryAction(project, id, build);
+    }
 
+    private int getLastSuccessfulBuildNumber(final String project) {
+        BuildableItemWithBuildWrappers item = Iterables.find(
+                Jenkins.getInstance().getAllItems(BuildableItemWithBuildWrappers.class),
+                new Predicate<BuildableItemWithBuildWrappers>() {
+                    public boolean apply(BuildableItemWithBuildWrappers buildableItemWithBuildWrappers) {
+                        return buildableItemWithBuildWrappers.getName().equals(project);
+                    }
+                });
 
-        url = addBuildId(url, build);
-
-        return url;
+        return item.asProject().getLastSuccessfulBuild().getNumber();
     }
 
     @Extension

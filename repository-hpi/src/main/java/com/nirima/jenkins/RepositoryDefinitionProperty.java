@@ -23,6 +23,7 @@
  */
 package com.nirima.jenkins;
 
+import com.nirima.jenkins.action.RepositoryAction;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -36,7 +37,6 @@ import org.kohsuke.stapler.export.ExportedBean;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 @ExportedBean
@@ -80,9 +80,10 @@ public class RepositoryDefinitionProperty extends BuildWrapper implements Serial
                 super.buildEnvVars(env);    //To change body of overridden methods use File | Settings | File Templates.
 
                 try {
-                    URL url = upstream.getUrl(build);
-                    env.put("Jenkins.Repository", url.toExternalForm());
-                    listener.getLogger().println("Setting environment Jenkins.Repository = " + url.toExternalForm());
+                    RepositoryAction repositoryAction = upstream.getAction(build);
+                    build.addAction(repositoryAction);
+                    env.put("Jenkins.Repository", repositoryAction.getUrl().toExternalForm());
+                    listener.getLogger().println("Setting environment Jenkins.Repository = " + repositoryAction.getUrl().toExternalForm());
                 } catch (SelectionType.RepositoryDoesNotExistException x) {
                     listener.getLogger().println("You asked for an upstream repository, but it does not exist");
                     throw new RuntimeException(x);

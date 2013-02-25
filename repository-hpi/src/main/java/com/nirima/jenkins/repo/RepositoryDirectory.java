@@ -25,7 +25,8 @@ package com.nirima.jenkins.repo;
 
 import java.util.Collection;
 
-public interface RepositoryDirectory extends RepositoryElement {
+public interface RepositoryDirectory extends RepositoryElement
+{
     Collection<? extends RepositoryElement> getChildren();
 
     RepositoryElement getChild(String element);

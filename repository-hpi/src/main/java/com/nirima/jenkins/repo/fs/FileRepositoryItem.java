@@ -35,12 +35,10 @@ import java.io.InputStream;
 import java.util.Date;
 
 public class FileRepositoryItem extends AbstractRepositoryElement implements RepositoryContent {
-    protected String name;
     protected File item;
 
     public FileRepositoryItem(RepositoryDirectory parent, File item) {
         super(parent);
-        this.name = name;
         this.item = item;
     }
 

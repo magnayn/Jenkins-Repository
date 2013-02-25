@@ -35,7 +35,7 @@ import java.util.List;
 
 public class ProjectElement extends AbstractRepositoryDirectory implements RepositoryDirectory {
 
-     BuildableItemWithBuildWrappers item;
+    BuildableItemWithBuildWrappers item;
 
     public ProjectElement(RepositoryDirectory parent, BuildableItemWithBuildWrappers project)
     {
@@ -56,6 +56,10 @@ public class ProjectElement extends AbstractRepositoryDirectory implements Repos
 
     public String getName() {
        return item.getName();
+    }
+
+    public String getDescription() {
+        return "Project " + item.getName();
     }
 
 

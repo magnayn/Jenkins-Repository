@@ -76,7 +76,9 @@ public class ProjectBuildRepositoryRoot extends AbstractRepositoryDirectory impl
        );
     }
 
-
+    public String getDescription() {
+        return item.toString();
+    }
 
 
 }
