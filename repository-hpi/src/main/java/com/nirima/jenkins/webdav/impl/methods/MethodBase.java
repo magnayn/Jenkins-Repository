@@ -104,8 +104,7 @@ public class MethodBase implements IMethod {
         m_baseUrl += root;
 
         // PathInfo will also be /config/woo, but we ignore the 1st part
-        m_path = request.getPathInfo();
-
+        m_path = request.getContextPath() + request.getPathInfo();
         if (m_path == null) {
             m_path = "/";
         } else {
