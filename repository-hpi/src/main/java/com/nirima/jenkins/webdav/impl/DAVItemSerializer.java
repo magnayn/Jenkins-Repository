@@ -24,7 +24,8 @@
 package com.nirima.jenkins.webdav.impl;
 
 import com.nirima.jenkins.webdav.interfaces.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLStreamException;
@@ -39,7 +40,7 @@ import java.util.Date;
  */
 public class DAVItemSerializer
 {
-    private static final Logger log                    = Logger.getLogger(DAVItemSerializer.class);
+    private static final Logger log                    = LoggerFactory.getLogger(DAVItemSerializer.class);
     public static final String  dateFormatString       = "EEE, dd MMM yyyy HH:mm:ss zzz";
     public static final String  createDateFormatString = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 

@@ -28,19 +28,20 @@ import com.nirima.jenkins.repo.AbstractRepositoryElement;
 import com.nirima.jenkins.repo.RepositoryContent;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Represent a directory
  */
 public class DirectoryRepositoryItem extends AbstractRepositoryElement implements RepositoryDirectory {
 
-    private static final Logger LOGGER = Logger.getLogger(RepositoryPlugin.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryPlugin.class.getName());
 
     protected Map<String, RepositoryElement> items;
 

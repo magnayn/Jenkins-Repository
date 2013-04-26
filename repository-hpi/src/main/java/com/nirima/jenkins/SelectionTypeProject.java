@@ -25,28 +25,29 @@ package com.nirima.jenkins;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 import com.nirima.jenkins.action.ProjectRepositoryAction;
 import com.nirima.jenkins.action.RepositoryAction;
 import hudson.Extension;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildableItemWithBuildWrappers;
-import hudson.model.Descriptor;
-import hudson.model.Job;
+import hudson.model.*;
+import hudson.tasks.BuildWrapper;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.net.MalformedURLException;
 import java.util.List;
-
+import hudson.plugins.promoted_builds.PromotedBuildAction;
 
 public class SelectionTypeProject extends SelectionType {
     public String project;
     public String build;
+    public String promoted;
 
     @DataBoundConstructor
-    public SelectionTypeProject(String project, String build) {
+    public SelectionTypeProject(String project, String build, String promoted) {
         this.project = project;
         this.build = build;
+        this.promoted = promoted;
     }
 
 
@@ -66,15 +67,40 @@ public class SelectionTypeProject extends SelectionType {
         this.build = buildId;
     }
 
+    public String getPromoted() {
+        return promoted;
+    }
+
+    public void setPromoted(String promoted) {
+        this.promoted = promoted;
+    }
+
     @Override
     public RepositoryAction getAction(AbstractBuild theBuild) throws MalformedURLException, RepositoryDoesNotExistException {
 
-        int id = getLastSuccessfulBuildNumber(project);
+        int id;
+        String suffix;
 
-        return new ProjectRepositoryAction(project, id, build);
+        if( build.equalsIgnoreCase("promotedRepository"))
+        {
+            suffix = "repository";
+            id = getPromotedBuildNumber(project, promoted);
+        }
+        else if(build.equalsIgnoreCase("promotedRepositoryChain"))
+        {
+            suffix = "repositoryChain";
+            id = getPromotedBuildNumber(project, promoted);
+        }
+        else
+        {
+            suffix = build;
+            id = getLastSuccessfulBuildNumber(project);
+        }
+
+        return new ProjectRepositoryAction(project, id, suffix);
     }
 
-    private int getLastSuccessfulBuildNumber(final String project) {
+    private BuildableItemWithBuildWrappers getProject(final String project) {
         BuildableItemWithBuildWrappers item = Iterables.find(
                 Jenkins.getInstance().getAllItems(BuildableItemWithBuildWrappers.class),
                 new Predicate<BuildableItemWithBuildWrappers>() {
@@ -82,8 +108,45 @@ public class SelectionTypeProject extends SelectionType {
                         return buildableItemWithBuildWrappers.getName().equals(project);
                     }
                 });
+        return item;
+    }
+
+    private int getLastSuccessfulBuildNumber(final String project) {
+        BuildableItemWithBuildWrappers item = getProject(project);
 
         return item.asProject().getLastSuccessfulBuild().getNumber();
+    }
+
+    private int getPromotedBuildNumber(final String project, final String promoted) {
+        BuildableItemWithBuildWrappers item = getProject(project);
+
+
+        Iterable<AbstractBuild> promotedItems = Iterables.filter(item.asProject().getBuilds(), new Predicate() {
+            public boolean apply(Object o) {
+                AbstractBuild abstractBuild = (AbstractBuild)o;
+
+                PromotedBuildAction pba = abstractBuild.getAction(PromotedBuildAction.class);
+                return ( pba != null && pba.getPromotion(promoted) != null );
+
+            }
+        });
+
+
+        Ordering<AbstractBuild> ordering = new Ordering<AbstractBuild>() {
+            @Override
+            public int compare(AbstractBuild l,  AbstractBuild r) {
+                return r.getNumber() - l.getNumber();
+            }
+        };
+
+        try
+        {
+            return ordering.max(promotedItems).getNumber();
+        }
+        catch(Exception ex)
+        {
+            throw new RuntimeException("No promotion of type " + promoted + " in project " + project);
+        }
     }
 
     @Extension

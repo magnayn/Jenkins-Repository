@@ -36,10 +36,14 @@ import com.nirima.jenkins.repo.AbstractRepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
 import com.nirima.jenkins.repo.build.ProjectBuildRepositoryRoot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class ProjectBuildList extends AbstractRepositoryDirectory implements RepositoryDirectory {
+
+    private static Logger log = LoggerFactory.getLogger(ProjectBuildList.class);
 
     public enum Type {
         SHA1,

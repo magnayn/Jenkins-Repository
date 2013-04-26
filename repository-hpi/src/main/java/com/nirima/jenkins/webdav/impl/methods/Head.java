@@ -26,7 +26,8 @@ package com.nirima.jenkins.webdav.impl.methods;
 import com.nirima.jenkins.webdav.impl.DAVItemSerializer;
 import com.nirima.jenkins.webdav.interfaces.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -44,7 +45,7 @@ import com.nirima.jenkins.webdav.interfaces.MethodException;
  */
 public class Head extends MethodBase {
 
-    private static Logger s_logger = Logger.getLogger(Head.class);
+    private static Logger s_logger = LoggerFactory.getLogger(Head.class);
 
     /*
      * (non-Javadoc)

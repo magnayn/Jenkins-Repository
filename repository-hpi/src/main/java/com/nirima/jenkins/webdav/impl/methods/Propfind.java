@@ -27,7 +27,8 @@ import com.nirima.jenkins.webdav.impl.DAVItemSerializer;
 import com.nirima.jenkins.webdav.impl.DavProperty;
 import com.nirima.jenkins.webdav.interfaces.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLStreamConstants;
@@ -44,7 +45,7 @@ import java.util.Collection;
  */
 public class Propfind extends MethodBase {
 
-    private static Logger s_logger = Logger.getLogger(Propfind.class);
+    private static Logger s_logger = LoggerFactory.getLogger(Propfind.class);
     private ArrayList<DavProperty> m_properties;
     private int m_depth = 0;
 

@@ -38,7 +38,7 @@ public class SelectionTypeSpecified extends SelectionType  {
 
          @Override
          public String getDisplayName() {
-             return "Specified Path in Repository";  //To change body of implemented methods use File | Settings | File Templates.
+             return "Specified Path in Repository";
          }
      }
 }

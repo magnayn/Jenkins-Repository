@@ -50,10 +50,15 @@ import java.io.OutputStream;
 import java.io.Serializable;
 
 import hudson.plugins.git.util.BuildData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Extension
 public class RepositoryPlugin extends Plugin implements RootAction, Serializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(RepositoryPlugin.class);
+
     public String getIconFileName() {
         return Functions.getResourcePath()+"/plugin/repository/static/icons/repository-32x32.png";
     }
@@ -122,6 +127,7 @@ public class RepositoryPlugin extends Plugin implements RootAction, Serializable
         catch (Exception e)
         {
             e.printStackTrace();
+            logger.error("Error trying to serve request");
             //s_logger.error(e.getMessage());
             //s_logger.error(e.toString());
             throw new RuntimeException(e);

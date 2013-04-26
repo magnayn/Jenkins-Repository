@@ -30,7 +30,8 @@ import com.nirima.jenkins.webdav.interfaces.MethodException;
 import com.nirima.jenkins.xml.XmlSerializerException;
 import com.nirima.jenkins.xml.XmlSerializerFactory;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +48,7 @@ import java.util.StringTokenizer;
  *         Style - Code Templates
  */
 public class MethodBase implements IMethod {
-    private static Logger s_logger = Logger.getLogger(MethodBase.class);
+    private static Logger s_logger = LoggerFactory.getLogger(MethodBase.class);
 
     protected static String s_dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz";
 

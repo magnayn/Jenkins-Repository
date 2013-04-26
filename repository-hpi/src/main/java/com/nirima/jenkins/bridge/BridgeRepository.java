@@ -28,14 +28,15 @@ import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
 import com.nirima.jenkins.repo.RootElement;
 import com.nirima.jenkins.webdav.interfaces.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 
 public class BridgeRepository implements IDavRepo {
-    private static final Logger log = Logger.getLogger(BridgeRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(BridgeRepository.class);
 
     IMimeTypeResolver mimeTypeResolver;
     RepositoryDirectory rootElement;

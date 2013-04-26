@@ -24,6 +24,8 @@
 package com.nirima.jenkins.webdav.impl.methods;
 import com.nirima.jenkins.webdav.interfaces.*;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -34,13 +36,24 @@ import java.io.InputStream;
  */
 public class Get extends Head {
 
+    private static Logger logger = LoggerFactory.getLogger(Get.class);
+
+
     @Override
     protected void writeContent(IDavFile fileItem) throws IOException {
-        InputStream is = fileItem.getContent();
-        BufferedOutputStream os = new BufferedOutputStream(this.getResponse().getOutputStream());
+        try
+        {
+            InputStream is = fileItem.getContent();
+            BufferedOutputStream os = new BufferedOutputStream(this.getResponse().getOutputStream());
 
-        IOUtils.copy(is, os);
-        os.flush();
-        is.close();
+            IOUtils.copy(is, os);
+            os.flush();
+            is.close();
+        }
+        catch(IOException ex)
+        {
+            logger.error("Error trying to GET item " + fileItem);
+            throw ex;
+        }
     }
 }

@@ -18,8 +18,13 @@ f.entry(title:_("Project"), field:"project") {
 
 f.entry(title:_("Build"), field:"build") {
      select(name:"build") {
-        f.option(selected:instance?.build=="repository", value:"repository", _("LastSuccessful / repository"))
-        f.option(selected:instance?.build=="repositoryChain", value:"repositoryChain", _("LastSuccessful / repositoryChain"))
+        f.option(selected:instance?.build=="repository", value:"repository", _("Last Successful / repository"))
+        f.option(selected:instance?.build=="repositoryChain", value:"repositoryChain", _("Last Successful / repositoryChain"))
+        f.option(selected:instance?.build=="promotedRepository", value:"promotedRepository", _("Promoted Build / repository"))
+        f.option(selected:instance?.build=="promotedRepositoryChain", value:"promotedRepositoryChain", _("Promoted Build / repositoryChain"))
     }
 }
 
+f.entry(title:_("Promoted Build"), field:"promoted") {
+    f.textbox()
+}

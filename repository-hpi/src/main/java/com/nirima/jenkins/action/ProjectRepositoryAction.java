@@ -6,11 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created with IntelliJ IDEA.
- * User: magnayn
- * Date: 24/01/2013
- * Time: 16:33
- * To change this template use File | Settings | File Templates.
+ * Action storing build repository URL.
  */
 public class ProjectRepositoryAction extends RepositoryAction {
     private static final long serialVersionUID = 1L;

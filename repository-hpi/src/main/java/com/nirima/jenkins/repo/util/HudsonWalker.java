@@ -38,6 +38,8 @@ import hudson.maven.reporters.MavenArtifact;
 import hudson.maven.reporters.MavenArtifactRecord;
 import hudson.model.*;
 import hudson.util.RunList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,6 +54,8 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class HudsonWalker {
+
+    private static final Logger log = LoggerFactory.getLogger(HudsonWalker.class);
 
     /**
      * visit everything in order.

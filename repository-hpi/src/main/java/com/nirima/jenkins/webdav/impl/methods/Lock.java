@@ -26,7 +26,8 @@ package com.nirima.jenkins.webdav.impl.methods;
 import com.nirima.jenkins.webdav.impl.DAVItemSerializer;
 import com.nirima.jenkins.webdav.interfaces.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLStreamWriter;
@@ -36,7 +37,7 @@ import javax.xml.stream.XMLStreamWriter;
  *         Style - Code Templates
  */
 public class Lock extends MethodBase {
-    private static Logger s_logger = Logger.getLogger(Lock.class);
+    private static Logger s_logger = LoggerFactory.getLogger(Lock.class);
 
     /*
      * (non-Javadoc)

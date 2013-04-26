@@ -1,25 +1,27 @@
 package com.nirima.jenkins.action;
 
+import jenkins.model.Jenkins;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created with IntelliJ IDEA.
- * User: magnayn
- * Date: 24/01/2013
- * Time: 16:35
- * To change this template use File | Settings | File Templates.
- */
 public class PathInRepositoryAction extends RepositoryAction {
 
-    URL url;
+    String subPath;
 
     public PathInRepositoryAction(String subPath) {
-
+        this.subPath = subPath;
     }
 
     @Override
     public URL getUrl() throws MalformedURLException {
+
+        URL url = new URL(Jenkins.getInstance().getRootUrl());
+
+        url = new URL(url, "plugin/repository");
+
+        url = new URL(url, subPath);
+
         return url;
     }
 

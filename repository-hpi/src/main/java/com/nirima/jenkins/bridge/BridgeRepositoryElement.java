@@ -84,4 +84,8 @@ public abstract class BridgeRepositoryElement<T extends RepositoryElement> imple
     public ArrayList<IDavLock> getLocks(IDavContext ctxt) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    public String toString() {
+        return "Bridge element " + element.getPath();
+    }
 }
