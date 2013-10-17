@@ -101,7 +101,7 @@ public class RepositoryPlugin extends Plugin implements RootAction, Serializable
             return;
         }
 
-        serveRequest(new BridgeRepository(null), "/plugin/repository");
+        serveRequest(new BridgeRepository(null), req.getContextPath()+"/plugin/repository");
     }
 
     public void serveRequest(IDavRepo repo, String root) {

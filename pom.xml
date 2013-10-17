@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.499</version>
+        <version>1.534</version>
     </parent>
 
     <groupId>com.nirima.jenkins.repository</groupId>
@@ -19,10 +19,15 @@
             <name>Nigel Magnay</name>
             <email>nigel.magnay@gmail.com</email>
         </developer>
+        <developer>
+            <id>bjwschaap</id>
+            <name>Bastiaan Schaap</name>
+            <email>bastiaan.schaap@gmail.com</email>
+        </developer>
     </developers>
 
     <properties>
-        <jenkins.version>1.499</jenkins.version>
+        <jenkins.version>1.534</jenkins.version>
     </properties>
 
     <licenses>
