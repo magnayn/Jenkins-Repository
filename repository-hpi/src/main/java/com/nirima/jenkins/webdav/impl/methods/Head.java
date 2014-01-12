@@ -112,7 +112,7 @@ public class Head extends MethodBase {
         String name = item.getName();
         if( name == null )
             name = "Repository";
-
+        writer.write("<HTML>");
         writer.write("<H1>" + name + "</H1>");
         writer.write("<TABLE>");
         for (IDavItem cItem : item.getChildren(ctxt)) {
@@ -140,6 +140,7 @@ public class Head extends MethodBase {
             writer.write("</TR>");
         }
         writer.write("</TABLE>");
+        writer.write("</HTML>");
     }
 
 }

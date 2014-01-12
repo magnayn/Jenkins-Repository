@@ -65,4 +65,9 @@ public class RootElement extends AbstractRepositoryDirectory implements Reposito
         return "";
     }
 
+    @Override
+    public String toString() {
+        return "RootElement{}";
+    }
+
 }

@@ -91,15 +91,25 @@ public class ProjectBuildList extends AbstractRepositoryDirectory implements Rep
 
             Map<String, ProjectBuildRepositoryRoot> children = new HashMap<String, ProjectBuildRepositoryRoot>();
 
-            for (Run run : item.asProject().getBuilds()) {
-                BuildData bd = run.getAction(BuildData.class);
-                if (bd != null && run.getResult() == Result.SUCCESS) {
-                    String sha1 = bd.getLastBuiltRevision().getSha1String();
+            log.info("Getting builds from {}", item);
 
-                    // Most recent, only if successful
-                    if (!children.containsKey(sha1) && run.getResult().isBetterOrEqualTo(Result.SUCCESS)) {
-                        children.put(sha1, new ProjectBuildRepositoryRoot(this, run, sha1));
+            for (Run run : item.asProject().getBuilds()) {
+                try
+                {
+                    BuildData bd = run.getAction(BuildData.class);
+                    if (bd != null && run.getResult() == Result.SUCCESS) {
+                        String sha1 = bd.getLastBuiltRevision().getSha1String();
+
+                        // Most recent, only if successful
+                        if (!children.containsKey(sha1) && run.getResult().isBetterOrEqualTo(Result.SUCCESS)) {
+                            children.put(sha1, new ProjectBuildRepositoryRoot(this, run, sha1));
+                        }
                     }
+                }
+                catch(Exception ex)
+                {
+                    log.error("Error processing {}", run);
+                    log.error("Error", ex);
                 }
             }
 

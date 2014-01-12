@@ -127,4 +127,17 @@ public class DirectoryRepositoryItem extends AbstractRepositoryElement implement
     {
        return getItems().get(element);
     }
+
+    @Override
+    public String toString() {
+        String str = "";
+
+        if( parent != null )
+            str += parent.toString();
+
+        str += "\\";
+        str += name;
+
+        return str;
+    }
 }

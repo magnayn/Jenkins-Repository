@@ -40,6 +40,9 @@ public class ProjectElement extends AbstractRepositoryDirectory implements Repos
     public ProjectElement(RepositoryDirectory parent, BuildableItemWithBuildWrappers project)
     {
         super(parent);
+        if( project == null )
+            throw new IllegalArgumentException("project must not be null");
+
         this.item = project;
     }
 
@@ -62,5 +65,8 @@ public class ProjectElement extends AbstractRepositoryDirectory implements Repos
         return "Project " + item.getName();
     }
 
-
+    @Override
+    public String toString() {
+        return "ProjectElement{" + item.getName() + "}";
+    }
 }

@@ -144,19 +144,28 @@ public class HudsonWalker {
             for (List<MavenBuild> builds : modulesMap.values()) {
                 for (MavenBuild build : builds) {
 
+                    log.trace("Visit mavenBuild {}", build);
+
                     visitor.visitBuild(build);
 
                     MavenArtifactRecord artifacts = build.getAction(MavenArtifactRecord.class);
                     if( artifacts != null )
                     {
-                        visitor.visitArtifact(build, artifacts.pomArtifact);
+                        log.trace("Visit mavenBuild {} artifacts {}", build, artifacts);
+                        try {
+                            visitor.visitArtifact(build, artifacts.pomArtifact);
 
-                        if (artifacts.mainArtifact != artifacts.pomArtifact) {
-                            // Sometimes the POM is the only thing being made..
-                            visitor.visitArtifact(build, artifacts.mainArtifact);
+                            if (artifacts.mainArtifact != artifacts.pomArtifact) {
+                                // Sometimes the POM is the only thing being made..
+                                visitor.visitArtifact(build, artifacts.mainArtifact);
+                            }
+                            for (MavenArtifact art : artifacts.attachedArtifacts) {
+                                visitor.visitArtifact(build, art);
+                            }
                         }
-                        for (MavenArtifact art : artifacts.attachedArtifacts) {
-                            visitor.visitArtifact(build, art);
+                        catch(Exception ex) {
+                            log.error("Error fetching artifact details");
+                            log.error("Error", ex);
                         }
                     }
                 }

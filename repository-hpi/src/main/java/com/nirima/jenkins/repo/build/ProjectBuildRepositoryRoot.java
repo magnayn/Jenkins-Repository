@@ -46,12 +46,14 @@ import hudson.maven.MavenModuleSetBuild;
 
 
 public class ProjectBuildRepositoryRoot extends AbstractRepositoryDirectory implements RepositoryDirectory {
-    private String name;
+    private final String name;
 
-    protected Run item;
+    protected final Run item;
 
     public ProjectBuildRepositoryRoot(RepositoryDirectory parent, final Run item, String name) {
         super(parent);
+        if( item == null || name == null )
+            throw new IllegalArgumentException("Must specify run and name");
         this.name = name;
         this.item = item;
     }
@@ -80,5 +82,10 @@ public class ProjectBuildRepositoryRoot extends AbstractRepositoryDirectory impl
         return item.toString();
     }
 
+
+    @Override
+    public String toString() {
+        return "ProjectBuildRepositoryRoot{" + name + "," + item.toString() + "}";
+    }
 
 }

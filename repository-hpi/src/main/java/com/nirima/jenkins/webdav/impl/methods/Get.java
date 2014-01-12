@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 package com.nirima.jenkins.webdav.impl.methods;
+import com.google.common.io.ByteStreams;
 import com.nirima.jenkins.webdav.interfaces.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author nigelm
@@ -41,19 +43,34 @@ public class Get extends Head {
 
     @Override
     protected void writeContent(IDavFile fileItem) throws IOException {
+        InputStream is = null;
         try
         {
-            InputStream is = fileItem.getContent();
-            BufferedOutputStream os = new BufferedOutputStream(this.getResponse().getOutputStream());
+            logger.trace("GET {}", fileItem);
+            is = fileItem.getContent();
+            OutputStream os = this.getResponse().getOutputStream();
 
-            IOUtils.copy(is, os);
+            long start = System.currentTimeMillis();
+
+            long bytes = ByteStreams.copy(is, os);
             os.flush();
-            is.close();
+
+            long duration = System.currentTimeMillis() - start;
+            if( duration == 0 )
+                duration = 1; // round up.
+
+            logger.info("Sent {} : {} bytes in {} ms ({}kB/sec", fileItem, bytes, duration, (bytes/duration) );
         }
         catch(IOException ex)
         {
-            logger.error("Error trying to GET item " + fileItem);
+            logger.error("Error trying to GET item {} ", fileItem);
+            logger.error("Error: ", ex);
             throw ex;
+        }
+        finally
+        {
+            if( is != null )
+                is.close();
         }
     }
 }

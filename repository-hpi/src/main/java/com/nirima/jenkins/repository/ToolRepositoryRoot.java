@@ -48,13 +48,15 @@ public class ToolRepositoryRoot extends AbstractRepositoryDirectory implements R
         List<RepositoryElement> elements = new ArrayList<RepositoryElement>();
 
         File file = new File(this.getClass().getResource("/tools").getFile());
-        for( File f : file.listFiles() )
-        {
-           RepositoryElement e1 =  new FileDirectoryRepositoryItem(null, f);
+        File[] listFiles = file.listFiles();
+        if( listFiles != null) {
+            for( File f : listFiles )
+            {
+               RepositoryElement e1 =  new FileDirectoryRepositoryItem(null, f);
 
-           elements.add( e1 );
+               elements.add( e1 );
+            }
         }
-
 
         return elements;
     }
@@ -62,5 +64,10 @@ public class ToolRepositoryRoot extends AbstractRepositoryDirectory implements R
     @Override
     public String getName() {
         return "tools";
+    }
+
+    @Override
+    public String toString() {
+        return "ToolRepositoryRoot{}";
     }
 }

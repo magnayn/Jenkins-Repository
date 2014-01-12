@@ -67,5 +67,8 @@ public class ProjectsElement extends AbstractRepositoryDirectory implements Repo
         throw new IllegalArgumentException();
     }
 
-
+    @Override
+    public String toString() {
+        return "ProjectsElement{}";
+    }
 }

@@ -53,7 +53,7 @@ public class Unlock extends MethodBase {
         }
 
         IDavItem file = item;
-        if (file == null || file.isLocked(ctxt) == false) {
+        if (!file.isLocked(ctxt)) {
             this.getResponse().setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }

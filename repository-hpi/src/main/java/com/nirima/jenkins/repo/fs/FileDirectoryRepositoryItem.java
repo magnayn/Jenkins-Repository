@@ -51,7 +51,10 @@ public class FileDirectoryRepositoryItem extends PopulateOnDemandDirectoryReposi
     protected IDirectoryPopulator getPopulator() {
        return new IDirectoryPopulator() {
             public void populate(final DirectoryRepositoryItem directory) {
-                for(File child : item.listFiles())
+                File[] listFiles = item.listFiles();
+                if( listFiles == null )
+                    return;
+                for(File child : listFiles)
 
                 if( child.isDirectory() )
                     add( new FileDirectoryRepositoryItem(FileDirectoryRepositoryItem.this, child),false);
@@ -60,5 +63,14 @@ public class FileDirectoryRepositoryItem extends PopulateOnDemandDirectoryReposi
 
             }
         };
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        if( parent != null )
+            str += parent.toString();
+        str += item.getName();
+        return str;
     }
 }

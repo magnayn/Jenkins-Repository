@@ -31,6 +31,8 @@ public class SimpleOnDemandItem extends PopulateOnDemandDirectoryRepositoryItem 
 
     public SimpleOnDemandItem(RepositoryDirectory parent, String item, IDirectoryPopulator populator) {
         super(parent, item);
+        if( populator == null )
+            throw new IllegalArgumentException("Populator must be specified");
         this.populator = populator;
     }
 

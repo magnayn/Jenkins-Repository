@@ -39,7 +39,7 @@ public class BridgeRepository implements IDavRepo {
     private static final Logger log = LoggerFactory.getLogger(BridgeRepository.class);
 
     IMimeTypeResolver mimeTypeResolver;
-    RepositoryDirectory rootElement;
+    final RepositoryDirectory rootElement;
 
     public BridgeRepository(IMimeTypeResolver mimeTypeResolver)
     {
@@ -48,6 +48,8 @@ public class BridgeRepository implements IDavRepo {
 
     public BridgeRepository(RepositoryDirectory root, IMimeTypeResolver mimeTypeResolver)
     {
+        if( root == null )
+            throw new IllegalArgumentException("BridgeRepository must have a root");
         this.rootElement = root;
         this.mimeTypeResolver = mimeTypeResolver;
     }
@@ -66,9 +68,16 @@ public class BridgeRepository implements IDavRepo {
             // Ignore breakdown case if '/'
             if (pathElements.length > 1 || pathElements[0].length() > 0) {
                 for (String element : pathElements) {
+                    log.trace("Found element {}", element);
                     if (currentItem instanceof RepositoryDirectory) {
                         RepositoryDirectory currentDirectory = (RepositoryDirectory) currentItem;
                         currentItem = currentDirectory.getChild(element);
+
+                        if( currentItem == null ) {
+                            log.error("Could not find item {} in element {}", element, currentDirectory);
+                            return null;
+                        }
+
                     }
 
                 }
@@ -79,6 +88,7 @@ public class BridgeRepository implements IDavRepo {
         catch(Exception ex)
         {
             log.error("No such repository path " + path);
+            log.error("Exception:", ex);
             return null;
         }
 
