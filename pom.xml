@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.546</version>
+        <version>1.532</version>
     </parent>
 
     <groupId>com.nirima.jenkins.repository</groupId>
@@ -27,7 +27,7 @@
     </developers>
 
     <properties>
-        <jenkins.version>1.546</jenkins.version>
+        <jenkins.version>1.532</jenkins.version>
     </properties>
 
     <licenses>
