@@ -44,7 +44,7 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
         // number seems to be always for the latest build, not the build that generated this
         // artifact; so we just use -1; it is essentially impossible that a project will be built
         // twice in the same millsecond, so there's no risk of collision
-        return _vfmt.format(date) + "-" + buildNo;
+        return new SimpleDateFormat(DAY_PATERN + "." + TIME_PATERN).format(date) + "-" + buildNo;
     }
 
     public static String formatDateVersion(Run buildRun) {
@@ -148,7 +148,7 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
             String dateVers = formatDateVersion(theItem.getBuild());
 
             String itemVersion = version.replaceAll("SNAPSHOT", dateVers);
-            String lastMod = _ufmt.format(theItem.getLastModified());
+            String lastMod = new SimpleDateFormat(DAY_PATERN + TIME_PATERN).format(theItem.getLastModified());
             buf.append("      <snapshotVersion>\n");
 
             // Optional classifier.
@@ -173,6 +173,6 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
         }
     }
 
-    protected static SimpleDateFormat _ufmt = new SimpleDateFormat("yyyyMMddHHmmss");
-    protected static SimpleDateFormat _vfmt = new SimpleDateFormat("yyyyMMdd.HHmmss");
+    private static final String DAY_PATERN = "yyyyMMdd";
+    private static final String TIME_PATERN = "HHmmss";
 }
