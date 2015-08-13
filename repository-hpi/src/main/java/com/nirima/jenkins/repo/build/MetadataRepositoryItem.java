@@ -25,6 +25,7 @@ package com.nirima.jenkins.repo.build;
 
 import hudson.maven.MavenBuild;
 import hudson.maven.reporters.MavenArtifact;
+import hudson.model.AbstractBuild;
 import hudson.model.Run;
 
 import java.text.SimpleDateFormat;
@@ -35,7 +36,7 @@ import java.util.*;
  */
 public class MetadataRepositoryItem extends TextRepositoryItem {
 
-    private MavenBuild build;
+    private AbstractBuild build;
     private String groupId, artifactId, version;
     private Map<MavenArtifact,ArtifactRepositoryItem> items = new HashMap<MavenArtifact,ArtifactRepositoryItem>();
 
@@ -52,7 +53,7 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
         return formatDateVersion(buildRun.getTime(), buildRun.getNumber());
     }
 
-    public MetadataRepositoryItem(MavenBuild build, MavenArtifact artifact) {
+    public MetadataRepositoryItem(AbstractBuild build, MavenArtifact artifact) {
         this.build      = build;
         this.groupId    = artifact.groupId;
         this.artifactId = artifact.artifactId;
@@ -80,7 +81,13 @@ public class MetadataRepositoryItem extends TextRepositoryItem {
     }
 
     public String getDescription() {
-        return "From Build #" + build.getNumber() + " of " + build.getParentBuild().getParent().getName();
+        if( build instanceof MavenBuild ) {
+            return "From Build #" + build.getNumber() + " of " + ((MavenBuild)build).getParentBuild().getParent()
+                .getName();
+        }
+        else {
+            return "From Build #" + build.getNumber() + " of " + build.getProject().getDisplayName();
+        }
     }
 
     public String getContentType() {

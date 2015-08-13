@@ -26,6 +26,7 @@ package com.nirima.jenkins.repo.build;
 import com.nirima.jenkins.repo.RepositoryContent;
 import hudson.maven.MavenBuild;
 import hudson.maven.reporters.MavenArtifact;
+import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import com.nirima.jenkins.repo.RepositoryDirectory;
 import com.nirima.jenkins.repo.RepositoryElement;
@@ -41,11 +42,11 @@ import java.util.Date;
 public class ArtifactRepositoryItem implements RepositoryContent {
 
     private MavenArtifact artifact;
-    private MavenBuild build;
+    private AbstractBuild build;
     private boolean timestampedSnapshot;
     private RepositoryDirectory directory;
 
-    public ArtifactRepositoryItem(MavenBuild build, MavenArtifact mavenArtifact, boolean timestampedSnapshot) {
+    public ArtifactRepositoryItem(AbstractBuild build, MavenArtifact mavenArtifact, boolean timestampedSnapshot) {
         this.artifact = mavenArtifact;
         this.build = build;
         this.timestampedSnapshot = timestampedSnapshot;
@@ -86,7 +87,13 @@ public class ArtifactRepositoryItem implements RepositoryContent {
     }
 
     public String getDescription() {
-        return "From Build #" + build.getNumber() + " of " + build.getParentBuild().getParent().getName();
+        if( build instanceof MavenBuild ) {
+            return "From Build #" + build.getNumber() + " of " + ((MavenBuild)build).getParentBuild().getParent()
+                .getName();
+        }
+        else {
+            return "From Build #" + build.getNumber() + " of " + build.getProject().getDisplayName();
+        }
     }
 
     public boolean fileExists() {
@@ -131,7 +138,7 @@ public class ArtifactRepositoryItem implements RepositoryContent {
         return null; // We don't know..
     }
 
-    public MavenBuild getBuild() {
+    public AbstractBuild getBuild() {
         return build;
     }
 }

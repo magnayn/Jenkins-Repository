@@ -24,6 +24,7 @@
 package com.nirima.jenkins;
 
 import com.nirima.jenkins.bridge.BridgeRepository;
+import com.nirima.jenkins.update.BuildUpdater;
 import com.nirima.jenkins.webdav.impl.MethodFactory;
 import com.nirima.jenkins.webdav.impl.ServletContextMimeTypeResolver;
 import com.nirima.jenkins.webdav.interfaces.IDavRepo;
@@ -94,6 +95,12 @@ public class RepositoryPlugin extends Plugin implements RootAction, Serializable
         String fullPath = req.getPathInfo();
         if (path.length() == 0)
             path = "/";
+
+        if( req.getMethod().equals("POST") && path.startsWith("/add_info") ) {
+          BuildUpdater bu = new BuildUpdater(req,rsp);
+          bu.execute();
+          return;
+        }
 
         if (path.indexOf("..") != -1 || path.length() < 1) {
             // don't serve anything other than files in the sub directory.

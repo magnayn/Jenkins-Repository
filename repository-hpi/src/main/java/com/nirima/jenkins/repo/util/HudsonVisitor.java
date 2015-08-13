@@ -31,6 +31,7 @@ import hudson.maven.MavenModule;
 import hudson.maven.MavenModuleSetBuild;
 import hudson.maven.reporters.MavenArtifact;
 import hudson.maven.reporters.MavenArtifactRecord;
+import hudson.model.AbstractBuild;
 import hudson.model.BuildableItemWithBuildWrappers;
 
 import java.util.ArrayList;
@@ -44,10 +45,10 @@ public abstract class HudsonVisitor {
     public void visitModuleSet(MavenModuleSetBuild build)
     {}
 
-    public void visitBuild(MavenBuild build)
+    public void visitBuild(AbstractBuild build)
     {}
 
-    public void visitArtifact(MavenBuild build, MavenArtifact artifact)
+    public void visitArtifact(AbstractBuild build, MavenArtifact artifact)
     {}
 
     public void visitProject(BuildableItemWithBuildWrappers item)

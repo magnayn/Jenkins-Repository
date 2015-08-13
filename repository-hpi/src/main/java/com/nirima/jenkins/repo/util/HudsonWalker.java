@@ -31,6 +31,9 @@ import com.nirima.jenkins.action.ProjectRepositoryAction;
 import com.nirima.jenkins.action.RepositoryAction;
 import com.nirima.jenkins.repo.RepositoryElement;
 import com.nirima.jenkins.repo.build.ArtifactRepositoryItem;
+import com.nirima.jenkins.update.ExtendedMavenArtifactRecord;
+import com.nirima.jenkins.update.FreestyleMavenArtifactRecords;
+
 import hudson.maven.MavenBuild;
 import hudson.maven.MavenModule;
 import hudson.maven.MavenModuleSetBuild;
@@ -149,30 +152,45 @@ public class HudsonWalker {
                     visitor.visitBuild(build);
 
                     MavenArtifactRecord artifacts = build.getAction(MavenArtifactRecord.class);
-                    if( artifacts != null )
-                    {
-                        log.trace("Visit mavenBuild {} artifacts {}", build, artifacts);
-                        try {
-                            visitor.visitArtifact(build, artifacts.pomArtifact);
-
-                            if (artifacts.mainArtifact != artifacts.pomArtifact) {
-                                // Sometimes the POM is the only thing being made..
-                                visitor.visitArtifact(build, artifacts.mainArtifact);
-                            }
-                            for (MavenArtifact art : artifacts.attachedArtifacts) {
-                                visitor.visitArtifact(build, art);
-                            }
-                        }
-                        catch(Exception ex) {
-                            log.error("Error fetching artifact details");
-                            log.error("Error", ex);
-                        }
+                    if( artifacts != null ) {
+                        visitMavenArtifactRecord(visitor, build, artifacts);
                     }
+
                 }
 
             }
 
+        } else if(run instanceof FreeStyleBuild) {
+            FreeStyleBuild fsb = (FreeStyleBuild) run;
+            FreestyleMavenArtifactRecords records = fsb.getAction(FreestyleMavenArtifactRecords.class);
+            if( records != null ) {
+                for(ExtendedMavenArtifactRecord record : records.recordList ) {
+                    visitMavenArtifactRecord(visitor, fsb, record);
+                }
+            }
+
         }
+    }
+
+    private static void visitMavenArtifactRecord(HudsonVisitor visitor, AbstractBuild build, MavenArtifactRecord artifacts) {
+
+        log.trace("Visit Build {} artifacts {}", build, artifacts);
+        try {
+            visitor.visitArtifact(build, artifacts.pomArtifact);
+
+            if (artifacts.mainArtifact != artifacts.pomArtifact) {
+                // Sometimes the POM is the only thing being made..
+                visitor.visitArtifact(build, artifacts.mainArtifact);
+            }
+            for (MavenArtifact art : artifacts.attachedArtifacts) {
+                visitor.visitArtifact(build, art);
+            }
+        }
+        catch(Exception ex) {
+            log.error("Error fetching artifact details");
+            log.error("Error", ex);
+        }
+
     }
 
 

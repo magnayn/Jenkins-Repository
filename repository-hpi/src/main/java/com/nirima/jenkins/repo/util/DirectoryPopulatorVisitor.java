@@ -34,6 +34,7 @@ import hudson.maven.MavenModule;
 import hudson.maven.MavenModuleSetBuild;
 import hudson.maven.reporters.MavenArtifact;
 import hudson.maven.reporters.MavenArtifactRecord;
+import hudson.model.AbstractBuild;
 import hudson.model.Run;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class DirectoryPopulatorVisitor extends HudsonVisitor {
         return Joiner.on("->").join(listOfProjectNames);
     }
 
-    public @Override void visitArtifact(MavenBuild build, MavenArtifact artifact)
+    public @Override void visitArtifact(AbstractBuild build, MavenArtifact artifact)
     {
         // add a Maven 2 compatible artifact entry
         ArtifactRepositoryItem repositoryItem = new ArtifactRepositoryItem(build, artifact, false);

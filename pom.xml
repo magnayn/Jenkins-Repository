@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.532</version>
+        <version>1.609.2</version>
     </parent>
 
     <groupId>com.nirima.jenkins.repository</groupId>
@@ -27,9 +27,36 @@
     </developers>
 
     <properties>
-        <jenkins.version>1.532</jenkins.version>
+        <hpi.plugin.version>1.113</hpi.plugin.version>
+        <jenkins.version>${project.parent.version}</jenkins.version>
+        <jdk.debug>true</jdk.debug>
+        <jdk.optimize>false</jdk.optimize>
+        <jdk.source>1.7</jdk.source>
+        <jdk.target>1.7</jdk.target>
     </properties>
+    <build>
+        <pluginManagement>
+            <plugins>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>${jdk.source}</source>
+                        <target>${jdk.target}</target>
+                        <debug>${jdk.debug}</debug>
+                        <optimize>${jdk.optimize}</optimize>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jenkins-ci.tools</groupId>
+                    <artifactId>maven-hpi-plugin</artifactId>
+                    <version>${hpi.plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
     <licenses>
        <license>
           <name>MIT</name>

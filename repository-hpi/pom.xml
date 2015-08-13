@@ -17,9 +17,9 @@
 
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Jenkins+Maven+Repository+Server</url>
 
-
-
     <build>
+
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
@@ -50,6 +50,22 @@
                                 a.copy(todir: target) {
                                 fileset(dir:src, includes:"*.pom")
                                 }
+
+                                target = new File(
+                                        "${basedir}/target/classes/tools/com/nirima/jenkins/repository/pom/${project.version}");
+
+                                src = new File(
+                                        "${settings.localRepository}/com/nirima/jenkins/repository/pom/${project.version}");
+
+                                a.mkdir(dir:target);
+
+                                a.copy(todir: target) {
+                                    fileset(dir:src, includes:"*.jar")
+                                }
+                                a.copy(todir: target) {
+                                    fileset(dir:src, includes:"*.pom")
+                                }
+
                             </source>
                         </configuration>
                     </execution>
@@ -113,7 +129,7 @@
             <groupId>com.nirima.jenkins.repository</groupId>
             <artifactId>jenkins-maven-plugin</artifactId>
             <version>${project.version}</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.maven</groupId>
